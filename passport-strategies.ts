@@ -5,14 +5,14 @@ import crypto from 'crypto';
 type Callback = (error: Error | null, user?: any | null, options?: any) => void;
 
 
-// const options = { usernameField: 'email' };
-export const localStrategy = new Strategy( async function verify(
-  username: string,
+const options = { usernameField: 'email' };
+export const localStrategy = new Strategy(options, async function verify(
+  email: string,
   password: string,
   done: Callback
 ) {
   try {
-    const user = await User.findOne({ username }).select('+passwordHash').select('+salt');
+    const user = await User.findOne({ email }).select('+passwordHash').select('+salt');
     if (!user) {
       return done(null, false, { message: 'Incorrect email or password.' });
     }
@@ -21,8 +21,7 @@ export const localStrategy = new Strategy( async function verify(
       if (!crypto.timingSafeEqual(user.passwordHash, hashedPassword)) {
         return done(null, null, { message: 'Incorrect email or password.' });
       }
-      console.log('🚀 ~ user in verify:', user);
-      return done(null, user); // puts this user into session according to serializeUser function
+      return done(null, user); // puts this user object into the session.
     });
   } catch (error) {
     return done(error as Error);

@@ -2,6 +2,7 @@ import express from 'express';
 import passport, { AuthenticateCallback } from 'passport';
 import crypto from 'crypto';
 import { TUser, User } from '../models/user.model';
+import { ensureLoggedIn } from 'connect-ensure-login';
 
 /* Configure password authentication strategy.
  *
@@ -32,27 +33,35 @@ const authRouter = express.Router();
 //     res.json({ message: 'Authenticated' });
 //   })(req, res, next);
 // });
+// authRouter.post(
+//   '/login/with-password',
+//   passport.authenticate('local', {
+//     successRedirect: '/api/v0/auth/login-success',
+//     failureRedirect: '/api/v0/auth/login-failed',
+//     failureFlash: true
+//   })
+// );
 
 authRouter.post(
   '/login/with-password',
   passport.authenticate('local', {
-    successRedirect: '/api/v0/auth/login-success',
     failureRedirect: '/api/v0/auth/login-failed',
-    failureFlash: true
-  })
+    successMessage: 'Logged in successfully.',
+    failureFlash: true,
+  }),
+  (req, res) => {
+    res.json({ message: 'Authenticated', user: req.user });
+  }
 );
 
-authRouter.post('/login-success', (req, res) => {
-  res.json({ message: 'success' });
-});
 
-authRouter.post('/login-failed', (req, res) => {
-  res.json({ message: 'faild' });
+authRouter.get('/login-failed', (req, res) => {
+  res.status(401).json({ message: 'Incorrect email or password.' });
 });
 
 authRouter.get('/status', (req, res) => {
   if (req.user) return res.json({ message: 'Authenticated', user: req.user });
-  return res.json({ message: 'Not Authenticated' });
+  return res.status(401).json({ message: 'Not Authenticated' });
 });
 
 authRouter.post('/logout', (req, res, next) => {

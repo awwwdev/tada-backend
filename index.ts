@@ -1,4 +1,5 @@
 import express, { Express, Request, Response, Application } from 'express';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import folderRouter from './routes/folder.route';
@@ -10,6 +11,7 @@ import authRouter from './routes/auth.route';
 import { localStrategy } from './passport-strategies';
 import listRouter from './routes/list.route';
 import taskRouter from './routes/task.route';
+import flash from 'express-flash';
 
 //For env File
 dotenv.config();
@@ -18,6 +20,13 @@ const app: Application = express();
 const port = process.env.PORT || 8000;
 
 const db = mongoose.connection;
+
+const corsOptions = {
+  origin: 'http://localhost:3000/',
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors());
 
 // middleware
 app.use(express.json());
@@ -32,9 +41,12 @@ app.use(
   })
 );
 
+
+app.use(flash());
 passport.use(localStrategy);
 
 passport.serializeUser((user: Express.User, next: Next) => {
+  console.log("🚀 ~ user:", user)
   process.nextTick(() => {
     // @ts-ignore
     next(null, user._id);
@@ -45,8 +57,10 @@ type SerializedUser = string;
 type Next = (error: Error | null, user?: any | null, options?: any) => void;
 
 passport.deserializeUser(async function (userId: SerializedUser, next: Next) {
+  console.log("🚀 ~ userId:", userId)
   try {
     const userObj = await User.findById(userId);
+    console.log("🚀 ~ userObj:", userObj)
     process.nextTick(() => next(null, userObj));
   } catch (err) {
     return next(err instanceof Error ? err : new Error('Internal Server Error: ' + err));
