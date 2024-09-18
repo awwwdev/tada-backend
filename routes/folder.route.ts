@@ -1,27 +1,16 @@
-import express, { Express, Request, Response , Application } from 'express';
-import { Folder } from '../models/folder.model';
+import express from 'express';
 import { getFolders, getFolder, createFolder, updateFolder, deleteFolder } from '../controllers/folder.controller';
-import connectEnsureLogIn from 'connect-ensure-login';
-var ensureLogIn = connectEnsureLogIn.ensureLoggedIn;
-var ensureLoggedIn = ensureLogIn();
+import ensureLoggedIn from '../auth/ensureLoggedIn';
 const folderRouter = express.Router();
 
-const checkAuthenticated = (req: Request, res: Response, next: any) => {  
-  if (req.isAuthenticated()) { return next() }
-  res.status(401).json({ message: 'Not Authenticated' });
-}
-
-
-folderRouter.get('/',  checkAuthenticated, getFolders);
-folderRouter.get("/:id", getFolder);
-folderRouter.post("/", ensureLogIn,  createFolder);
+folderRouter.get('/', ensureLoggedIn, getFolders);
+folderRouter.get('/:id', ensureLoggedIn, getFolder);
+folderRouter.post('/', ensureLoggedIn, createFolder);
 
 // update a Folder
-folderRouter.put("/:id", updateFolder);
+folderRouter.put('/:id', ensureLoggedIn, updateFolder);
 
 // delete a Folder
-folderRouter.delete("/:id", deleteFolder);
-
+folderRouter.delete('/:id', ensureLoggedIn, deleteFolder);
 
 export default folderRouter;
-

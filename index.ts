@@ -8,6 +8,8 @@ import { User } from './models/user.model';
 import MongoStore from 'connect-mongo';
 import authRouter from './routes/auth.route';
 import { localStrategy } from './passport-strategies';
+import listRouter from './routes/list.route';
+import taskRouter from './routes/task.route';
 
 //For env File
 dotenv.config();
@@ -57,6 +59,8 @@ app.use(passport.session()); // attaches user object to request
 // routes
 app.use('/api/v0/auth/', authRouter);
 app.use('/api/v0/folders', folderRouter);
+app.use('/api/v0/lists', listRouter);
+app.use('/api/v0/tasks', taskRouter);
 
 mongoose
   .connect(process.env.MONGODB_URI ?? '')
