@@ -32,7 +32,7 @@ app.use(
 
 passport.use(localStrategy);
 
-passport.serializeUser((user: Express.User, next: Callback) => {
+passport.serializeUser((user: Express.User, next: Next) => {
   process.nextTick(() => {
     // @ts-ignore
     next(null, user._id);
@@ -40,22 +40,19 @@ passport.serializeUser((user: Express.User, next: Callback) => {
 });
 
 type SerializedUser = string;
-type Callback = (error: Error | null, user?: any | null, options?: any) => void;
+type Next = (error: Error | null, user?: any | null, options?: any) => void;
 
-passport.deserializeUser(async function (userId: SerializedUser, next: Callback) {
+passport.deserializeUser(async function (userId: SerializedUser, next: Next) {
   try {
     const userObj = await User.findById(userId);
-    process.nextTick(() => {
-      return next(null, userObj);
-    });
-  } catch (error) {
-    return next(error instanceof Error ? error : new Error('Internal Server Error: ' + error));
+    process.nextTick(() => next(null, userObj));
+  } catch (err) {
+    return next(err instanceof Error ? err : new Error('Internal Server Error: ' + err));
   }
 });
 
 app.use(passport.initialize());
 app.use(passport.session()); // attaches user object to request
-// app.use(passport.authenticate('session'));
 
 // routes
 app.use('/api/v0/auth/', authRouter);
