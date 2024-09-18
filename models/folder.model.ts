@@ -1,9 +1,12 @@
-import { Schema , model } from 'mongoose';
+import { HydratedDocument, InferRawDocType, Schema, model } from 'mongoose';
 // Schema
-export const FolderScehma = new Schema({
+const schemaDefinition = {
   name: { type: String, required: true },
-  email: { type: String, required: true },
-  avatar: String
-});
+  emojies: [{ type: String, required: false }],
+  authorId: { type: Schema.ObjectId, required: true },
+} as const;
+export const FolderScehma = new Schema(schemaDefinition, { timestamps: true });
 
-export const Folder = model("Product", FolderScehma);
+export const Folder = model('Folder', FolderScehma);
+export type TFolderRaw = InferRawDocType<typeof schemaDefinition>;
+export type TFodler = HydratedDocument<TFolderRaw>;

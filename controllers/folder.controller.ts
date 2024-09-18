@@ -8,9 +8,7 @@ export const getFolders = async (req: Request, res: Response) => {
     const folders = await Folder.find({});
     res.status(200).json(folders);
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ message: error.message });
-    }
+    res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
 };
 
@@ -18,18 +16,19 @@ export const getFolder = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const folder = await Folder.findById(id);
-    res.status(200).json(Folder);
+    res.status(200).json(folder);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
 };
 
 export const createFolder = async (req: Request, res: Response) => {
   try {
     const folder = await Folder.create(req.body);
-    res.status(200).json(Folder);
+    res.status(200).json(folder);
+    console.log(folder);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
 };
 
@@ -39,14 +38,14 @@ export const updateFolder = async (req: Request, res: Response) => {
 
     const folder = await Folder.findByIdAndUpdate(id, req.body);
 
-    if (!Folder) {
+    if (!folder) {
       return res.status(404).json({ message: "Folder not found" });
     }
 
     const updatedFolder = await Folder.findById(id);
     res.status(200).json(updatedFolder);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
 };
 
@@ -59,9 +58,8 @@ export const deleteFolder = async (req: Request, res: Response) => {
     if (!Folder) {
       return res.status(404).json({ message: "Folder not found" });
     }
-
     res.status(200).json({ message: "Folder deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
 };
