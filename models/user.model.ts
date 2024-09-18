@@ -1,4 +1,5 @@
 import mongoose, { HydratedDocument, InferRawDocType } from 'mongoose';
+import { isEmail } from 'validator';
 const Schema = mongoose.Schema;
 
 const schemaDefinition = {
@@ -11,6 +12,12 @@ const schemaDefinition = {
     type: String,
     required: true,
     unique: true,
+    validate: {
+      validator: function (value: string) {
+        return isEmail(value);
+      },
+      message: 'Invalid email.',
+    }
   },
   passwordHash: {
     type: Buffer,

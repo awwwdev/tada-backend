@@ -77,6 +77,11 @@ authRouter.post('/signup', function (req, res, next) {
     if (err) return next(err);
 
     try {
+      // check if email already exists
+
+      // check if email is valid
+      // check if password is valid
+
       const user = await User.create({
         username: req.body.username,
         email: req.body.email,
