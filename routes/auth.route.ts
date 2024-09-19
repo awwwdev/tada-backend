@@ -3,6 +3,7 @@ import passport, { AuthenticateCallback } from 'passport';
 import crypto from 'crypto';
 import { TUser, User } from '../models/user.model';
 import { ensureLoggedIn } from 'connect-ensure-login';
+import ERRORS from '../errors';
 
 /* Configure password authentication strategy.
  *
@@ -46,22 +47,30 @@ authRouter.post(
   '/login/with-password',
   passport.authenticate('local', {
     failureRedirect: '/api/v0/auth/login-failed',
-    successMessage: 'Logged in successfully.',
+    // successRedirect: '/api/v0/auth/login-success',
+    // successMessage: 'Logged in successfully.',
     failureFlash: true,
   }),
   (req, res) => {
-    res.json({ message: 'Authenticated', user: req.user });
+    res.status(200).json({ message: 'Authenticated', user: req.user });
   }
 );
 
-
-authRouter.get('/login-failed', (req, res) => {
-  res.status(401).json({ message: 'Incorrect email or password.' });
+authRouter.post('/login-success', (req, res) => {
+  res.status(200).json({ message: 'Authenticated', user: req.user });
 });
 
-authRouter.get('/status', (req, res) => {
+authRouter.get('/login-success', (req, res) => {
+  res.status(200).json({ message: 'Authenticated', user: 1 });
+});
+
+authRouter.get('/login-failed', (req, res) => {
+  res.status(401).json(ERRORS.INVALID_CREDENTIALS);
+});
+
+authRouter.get('/user', (req, res) => {
   if (req.user) return res.json({ message: 'Authenticated', user: req.user });
-  return res.status(401).json({ message: 'Not Authenticated' });
+  return res.json({ message: ERRORS.NOT_AUTHENTICATED.message });
 });
 
 authRouter.post('/logout', (req, res, next) => {
@@ -77,22 +86,19 @@ authRouter.post('/signup', function (req, res, next) {
     if (err) return next(err);
 
     try {
-      // check if email already exists
-
-      // check if email is valid
-      // check if password is valid
-
       const user = await User.create({
-        username: req.body.username,
+        // username: req.body.username,
         email: req.body.email,
         passwordHash: hashedPassword,
         salt: salt,
       });
-
       req.login(user, (err) => {
         if (err) return next(err);
         // res.redirect('/');
-        res.json({ message: 'User created successfully' });
+
+        // @ts-ignore
+        const { salt, passwordHash, ...userWithoutSensitiveData } = user._doc;
+        res.json({ message: 'User created successfully', user: userWithoutSensitiveData });
       });
     } catch (error) {
       return next(error);

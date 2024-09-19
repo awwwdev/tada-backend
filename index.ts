@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(
   session({
-    secret: 'keyboard cat',
+    secret: 'the flying elephant',
     resave: false,
     saveUninitialized: true,
     store: new MongoStore({ mongoUrl: process.env.MONGODB_URI }),
