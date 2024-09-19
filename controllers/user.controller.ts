@@ -1,11 +1,11 @@
 // const Product = require("../models/product.model");
 import { User } from "../models/user.model";
-import type {  Request, Response  } from 'express';
+import type { Request, Response } from 'express';
 
 
 export const getUsers = async (req: Request, res: Response) => {
   try {
-    const users = await User.find({});
+    const users = await User.find({}).populate('folders');
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
@@ -15,7 +15,7 @@ export const getUsers = async (req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate('folders');
     res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
@@ -43,7 +43,7 @@ export const updateUser = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const updatedUser = await User.findById(id);
+    const updatedUser = await User.findById(id).populate('folders');
     res.status(200).json(updatedUser);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
