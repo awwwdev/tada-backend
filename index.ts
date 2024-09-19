@@ -37,7 +37,7 @@ app.use(
     secret: 'the flying elephant',
     resave: false,
     saveUninitialized: true,
-    store: new MongoStore({ mongoUrl: process.env.MONGODB_URI }),
+    store: new MongoStore({ mongoUrl: process.env.MONGODB_URL }),
   })
 );
 
@@ -74,7 +74,7 @@ app.use('/api/v0/lists', listRouter);
 app.use('/api/v0/tasks', taskRouter);
 
 mongoose
-  .connect(process.env.MONGODB_URI ?? '')
+  .connect(process.env.MONGODB_URL ?? '')
   .then(() => {
     console.log('Connected to MongoDB');
     app.listen(port, () => {
