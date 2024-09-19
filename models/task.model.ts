@@ -3,15 +3,15 @@ import { HydratedDocument, InferRawDocType, Schema, model } from 'mongoose';
 const schemaDefinition = {
   name: { type: String, required: true },
   emojies: [{ type: String, required: false }],
-  authorId: { type: Schema.ObjectId, required: true },
+  author: { type: Schema.ObjectId, required: true, ref: 'User' },
   description: { type: String, required: false },
-  lists: [
-    {
-      id: { type: Schema.ObjectId, ref: 'List' },
-      orderInList: { type: Number, required: false },
-      addedAt: { type: Date, required: true },
-    },
-  ],
+  // lists: [
+  //   {
+  //     id: { type: Schema.ObjectId, ref: 'List' },
+  //     orderInList: { type: Number, required: false },
+  //     addedAt: { type: Date, required: true },
+  //   },
+  // ],
   label: { type: String, required: true },
   status: {
     type: String,
@@ -29,10 +29,10 @@ const schemaDefinition = {
   postTasks: [{ type: Schema.ObjectId, ref: 'Task' }],
   comments: [
     {
-      authorId: { type: Schema.ObjectId, ref: 'Comment' },
+      author: { type: Schema.ObjectId, ref: 'User' },
       body: { type: String, required: true },
       createdAt: { type: Date, required: true },
-      replyToCommentId: { type: Schema.ObjectId, ref: 'Comment' },
+      // replyToCommentId: { type: Schema.ObjectId, ref: 'Comment' },
     },
   ],
   assingnees: [
@@ -68,7 +68,9 @@ const schemaDefinition = {
 
 } as const;
 export const TaskSchema = new Schema(schemaDefinition, { timestamps: true });
-
+TaskSchema.set('toJSON', {
+  virtuals: true,
+});
 export const Task = model('Task', TaskSchema);
 export type TTaskRaw = InferRawDocType<typeof schemaDefinition>;
 export type TTask = HydratedDocument<TTaskRaw>;

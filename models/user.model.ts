@@ -3,11 +3,17 @@ import { isEmail } from 'validator';
 const Schema = mongoose.Schema;
 
 const schemaDefinition = {
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-  },
+  // username: {
+  //   type: String,
+  //   required: false,
+  //   unique: true,
+  // },
+  folders: [{
+    id: { type: Schema.ObjectId, ref: 'Folder' },
+    show: { type: Boolean, required: false },
+    orderInPanel: { type: Number, required: false },
+    addedAt: { type: Date, required: true },
+  }],
   email: {
     type: String,
     required: true,
@@ -27,7 +33,9 @@ const schemaDefinition = {
   salt: { type: Buffer, required: true, select: false },
 } as const;
 const UserSchema = new Schema(schemaDefinition, { timestamps: true });
-
+UserSchema.set('toJSON', {
+  virtuals: true,
+});
 export const User = mongoose.model('User', UserSchema);
 export type TUserRaw = InferRawDocType<typeof schemaDefinition>;
 export type TUser = HydratedDocument<TUserRaw>;
