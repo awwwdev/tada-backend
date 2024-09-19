@@ -1,7 +1,7 @@
 import { HydratedDocument, InferRawDocType, Schema, model } from 'mongoose';
 // Schema
 const schemaDefinition = {
-  name: { type: String, required: true },
+  label: { type: String, required: true },
   emojies: [{ type: String, required: false }],
   author: { type: Schema.ObjectId, required: true, ref: 'User' },
   description: { type: String, required: false },
@@ -12,7 +12,6 @@ const schemaDefinition = {
   //     addedAt: { type: Date, required: true },
   //   },
   // ],
-  label: { type: String, required: true },
   status: {
     type: String,
     required: true,
