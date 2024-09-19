@@ -1,6 +1,7 @@
 import { Strategy } from 'passport-local';
 import { User } from './models/user.model';
 import crypto from 'crypto';
+import ERRORS from './errors';
 
 type Callback = (error: Error | null, user?: any | null, options?: any) => void;
 
@@ -14,14 +15,15 @@ export const localStrategy = new Strategy(options, async function verify(
   try {
     const user = await User.findOne({ email }).select('+passwordHash').select('+salt');
     if (!user) {
-      return done(null, false, { message: 'Incorrect email or password.' });
+      return done(null, false, ERRORS.INVALID_CREDENTIALS);
     }
     crypto.pbkdf2(password, user.salt, 310000, 32, 'sha256', (err, hashedPassword) => {
       if (err) return done(err);
       if (!crypto.timingSafeEqual(user.passwordHash, hashedPassword)) {
-        return done(null, null, { message: 'Incorrect email or password.' });
+        return done(null, null, ERRORS.INVALID_CREDENTIALS);
       }
-      return done(null, user); // puts this user object into the session.
+      const { salt, passwordHash, ...userWithoutSensitiveData } = user.toObject();
+      return done(null, userWithoutSensitiveData); // puts this user object into the session.
     });
   } catch (error) {
     return done(error as Error);
