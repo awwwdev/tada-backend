@@ -10,9 +10,7 @@ const schemaDefinition = {
   // },
   folders: [{
     id: { type: Schema.ObjectId, ref: 'Folder' },
-    show: { type: Boolean, required: false },
-    orderInPanel: { type: Number, required: false },
-    addedAt: { type: Date, required: true },
+    name: { type: String, required: true },
   }],
   email: {
     type: String,

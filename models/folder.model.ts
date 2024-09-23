@@ -4,6 +4,8 @@ const schemaDefinition = {
   name: { type: String, required: true },
   emojies: [{ type: String, required: false }],
   author: { type: Schema.ObjectId, required: true, ref: 'User' },
+  show: { type: Boolean, required: false },
+  orderInPanel: { type: Number, required: false },
   lists: [
     {
       id: { type: Schema.ObjectId, ref: 'List', required: true },

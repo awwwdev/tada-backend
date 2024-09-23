@@ -5,6 +5,7 @@ const schemaDefinition = {
   emojies: [{ type: String, required: false }],
   author: { type: Schema.ObjectId, required: true , ref: 'User' },
   description: { type: String, required: false },
+  folderId: { type: Schema.ObjectId, required: false, ref: 'Folder' },
   tasks: [
     {
       id: { type: Schema.ObjectId, ref: 'Task' },

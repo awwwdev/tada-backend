@@ -12,6 +12,7 @@ import { localStrategy } from './passport-strategies';
 import listRouter from './routes/list.route';
 import taskRouter from './routes/task.route';
 import flash from 'express-flash';
+import morgan from 'morgan';
 
 //For env File
 dotenv.config();
@@ -26,6 +27,7 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 
+app.use(morgan("tiny"));
 app.use(cors());
 
 // middleware
