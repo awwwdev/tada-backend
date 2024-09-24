@@ -2,17 +2,14 @@ import express, { Express, Request, Response, Application } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import folderRouter from './routes/folder.route';
 import session from 'express-session';
 import passport from 'passport';
 import { User } from './models/user.model';
 import MongoStore from 'connect-mongo';
-import authRouter from './routes/auth.route';
 import { localStrategy } from './passport-strategies';
-import listRouter from './routes/list.route';
-import taskRouter from './routes/task.route';
 import flash from 'express-flash';
 import morgan from 'morgan';
+import router from './routes';
 
 //For env File
 dotenv.config();
@@ -34,9 +31,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// need cookieParser middleware before we can do anything with cookies
+
+
+const SESSION_SECRET_KEY = process.env.SESSION_SECRET_KEY || "the flying elephant";
+
 app.use(
   session({
-    secret: 'the flying elephant',
+    secret: SESSION_SECRET_KEY,
     resave: false,
     saveUninitialized: true,
     store: new MongoStore({ mongoUrl: process.env.MONGODB_URL }),
@@ -70,10 +72,7 @@ app.use(passport.initialize());
 app.use(passport.session()); // attaches user object to request
 
 // routes
-app.use('/api/v0/auth/', authRouter);
-app.use('/api/v0/folders', folderRouter);
-app.use('/api/v0/lists', listRouter);
-app.use('/api/v0/tasks', taskRouter);
+app.use('/api/v0', router);
 
 mongoose
   .connect(process.env.MONGODB_URL ?? '')
