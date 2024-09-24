@@ -1,13 +1,11 @@
 // const Product = require("../models/product.model");
 import { Folder } from '../models/folder.model';
 import type { Request, Response } from 'express';
-import { User } from '../models/user.model';
 
 export const getFolders = async (req: Request, res: Response) => {
   try {
     const filterOptions = req.query.userId ? { author: req.query.userId } : {};
     const folders = await Folder.find(filterOptions).populate('author').populate('lists');
-    console.log("🚀 ~ folders:", folders)
     res.status(200).json(folders);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });

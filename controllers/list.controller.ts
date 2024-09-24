@@ -26,7 +26,6 @@ export const createList = async (req: Request, res: Response) => {
   try {
     const list = await List.create(req.body);
     res.status(200).json(list);
-    console.log(list);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
