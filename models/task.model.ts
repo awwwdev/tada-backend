@@ -4,7 +4,8 @@ const schemaDefinition = {
   label: { type: String, required: true },
   emojies: [{ type: String, required: false }],
   author: { type: Schema.ObjectId, required: true, ref: 'User' },
-  description: { type: String, required: false },
+  note: { type: String, required: false },
+  // author: { type: Schema.ObjectId, required: true, ref: 'User' },
   // lists: [
   //   {
   //     id: { type: Schema.ObjectId, ref: 'List' },
