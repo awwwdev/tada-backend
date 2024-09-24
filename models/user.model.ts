@@ -8,10 +8,12 @@ const schemaDefinition = {
   //   required: false,
   //   unique: true,
   // },
-  folders: [{
-    id: { type: Schema.ObjectId, ref: 'Folder' },
-    name: { type: String, required: true },
-  }],
+  folders: [
+    {
+      id: { type: Schema.ObjectId, ref: 'Folder' },
+      name: { type: String, required: true },
+    },
+  ],
   email: {
     type: String,
     required: true,
@@ -21,7 +23,7 @@ const schemaDefinition = {
         return isEmail(value);
       },
       message: 'Invalid email.',
-    }
+    },
   },
   passwordHash: {
     type: Buffer,
@@ -29,6 +31,25 @@ const schemaDefinition = {
     select: false,
   },
   salt: { type: Buffer, required: true, select: false },
+  settings: {
+    startOfWeek: {
+      type: String,
+      required: true,
+      default: 'sunday',
+      enum: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
+    },
+    showCompletedTasks: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    theme: {
+      type: String,
+      required: true,
+      default: 'system',
+      enum: ['light', 'dark', 'system'],
+    },
+  },
 } as const;
 const UserSchema = new Schema(schemaDefinition, { timestamps: true });
 UserSchema.set('toJSON', {
@@ -37,4 +58,3 @@ UserSchema.set('toJSON', {
 export const User = mongoose.model('User', UserSchema);
 export type TUserRaw = InferRawDocType<typeof schemaDefinition>;
 export type TUser = HydratedDocument<TUserRaw>;
-
