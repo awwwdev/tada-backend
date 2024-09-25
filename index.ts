@@ -17,11 +17,12 @@ dotenv.config();
 const app: Application = express();
 const port = process.env.PORT || 8000;
 
-const db = mongoose.connection;
+// const db = mongoose.connection;
 
 const corsOptions = {
   origin: process.env.FRONTEND_URL,
   optionsSuccessStatus: 200,
+  Credentials: true,
 
 };
 
