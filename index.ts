@@ -20,12 +20,12 @@ const port = process.env.PORT || 8000;
 const db = mongoose.connection;
 
 const corsOptions = {
-  origin: 'http://localhost:3000/',
+  origin: process.env.FRONTEND_URL,
   optionsSuccessStatus: 200,
 };
 
 app.use(morgan("tiny"));
-app.use(cors());
+app.use(cors(corsOptions));
 
 // middleware
 app.use(express.json());
