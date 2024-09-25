@@ -22,7 +22,7 @@ const port = process.env.PORT || 8000;
 const corsOptions = {
   origin: process.env.FRONTEND_URL,
   optionsSuccessStatus: 200,
-  Credentials: true,
+  credentials: true,
 };
 
 app.use(morgan("tiny"));
