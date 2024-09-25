@@ -23,7 +23,6 @@ const corsOptions = {
   origin: process.env.FRONTEND_URL,
   optionsSuccessStatus: 200,
   Credentials: true,
-
 };
 
 app.use(morgan("tiny"));
