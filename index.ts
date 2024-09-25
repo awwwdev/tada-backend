@@ -22,9 +22,11 @@ const db = mongoose.connection;
 const corsOptions = {
   origin: process.env.FRONTEND_URL,
   optionsSuccessStatus: 200,
+
 };
 
 app.use(morgan("tiny"));
+app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 
 // middleware
