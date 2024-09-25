@@ -1,11 +1,12 @@
 // const Product = require("../models/product.model");
 import { List } from "../models/list.model";
-import type {  Request, Response  } from 'express';
+import type { Request, Response } from 'express';
 
 
 export const getLists = async (req: Request, res: Response) => {
   try {
-    const lists = await List.find({}).populate('author').populate('tasks');;
+    // @ts-ignore
+    const lists = await List.find({ author: req?.user?._id }).populate('author').populate('tasks');;
     res.status(200).json(lists);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
@@ -15,7 +16,7 @@ export const getLists = async (req: Request, res: Response) => {
 export const getList = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const list = await List.findById(id).populate('author').populate('lists');;
+    const list = await List.findById(id).populate('author').populate('tasks.task');
     res.status(200).json(list);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
@@ -41,7 +42,8 @@ export const updateList = async (req: Request, res: Response) => {
       return res.status(404).json({ message: "List not found" });
     }
 
-    const updatedList = await List.findById(id).populate('author').populate('lists');;
+    const updatedList = await List.findById(id).populate('author').populate('tasks.id');
+    console.log("🚀 ~ updatedList:", updatedList)
     res.status(200).json(updatedList);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });

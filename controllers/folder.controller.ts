@@ -4,8 +4,9 @@ import type { Request, Response } from 'express';
 
 export const getFolders = async (req: Request, res: Response) => {
   try {
-    const filterOptions = req.query.userId ? { author: req.query.userId } : {};
-    const folders = await Folder.find(filterOptions).populate('author').populate('lists');
+    // const filterOptions = req.query.userId ? { author: req.query.userId } : {};
+    // @ts-ignore
+    const folders = await Folder.find({author: req?.user?._id}).populate('author').populate('lists');
     res.status(200).json(folders);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });

@@ -9,6 +9,7 @@ const schemaDefinition = {
   tasks: [
     {
       id: { type: Schema.ObjectId, ref: 'Task' },
+      task: { type: Schema.ObjectId, ref: 'Task' },
       orderInList: { type: Number, required: false },
       addedAt: { type: Date, required: true },
     },
