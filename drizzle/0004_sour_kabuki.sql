@@ -1,0 +1,1 @@
+ALTER TABLE "list" ALTER COLUMN "order_in_panel" DROP NOT NULL;

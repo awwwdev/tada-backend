@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1727426908113,
+      "tag": "0000_majestic_marvel_apes",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1727622452808,
+      "tag": "0001_low_argent",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1727625994665,
+      "tag": "0002_useful_tiger_shark",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1727630106967,
+      "tag": "0003_nasty_speed_demon",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1727630176652,
+      "tag": "0004_sour_kabuki",
+      "breakpoints": true
+    }
+  ]
+}

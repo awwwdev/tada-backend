@@ -1,14 +1,18 @@
 // const Product = require("../models/product.model");
-import { List } from '../models/list.model';
+import { eq } from 'drizzle-orm';
 import { Task } from "../models/task.model";
 import type { Request, Response } from 'express';
+import getDBClient from '../db/client';
+
+const db = getDBClient();
 
 
 export const getTasks = async (req: Request, res: Response) => {
   try {
     // const filterOptions = req.query.userId ? { author: req.query.userId } : {};
     // @ts-ignore
-    const tasks = await Task.find({ author: req.user._id }).populate('author');;
+    const tasks = await db.select().from(Task);
+    // Task.find({ author: req.user._id }).populate('author');
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
@@ -18,7 +22,8 @@ export const getTasks = async (req: Request, res: Response) => {
 export const getTask = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const task = await Task.findById(id);
+    const [task] = await db.select().from(Task).where(eq(Task.id, id));
+    // Task.findById(id);
     res.status(200).json(task);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
@@ -27,7 +32,8 @@ export const getTask = async (req: Request, res: Response) => {
 
 export const createTask = async (req: Request, res: Response) => {
   try {
-    const task = await Task.create(req.body);
+    const [task] = await db.insert(Task).values(req.body).returning();
+    //  Task.create(req.body);
     res.status(200).json(task);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
@@ -38,14 +44,15 @@ export const updateTask = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const task = await Task.findByIdAndUpdate(id, req.body);
+    const [task] = await db.update(Task).set(req.body).where(eq(Task.id, id)).returning();
+    //  Task.findByIdAndUpdate(id, req.body);
 
     if (!task) {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    const updatedTask = await Task.findById(id);
-    res.status(200).json(updatedTask);
+    // const updatedTask = await Task.findById(id);
+    res.status(200).json(task);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
@@ -55,12 +62,13 @@ export const deleteTask = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    const task = await Task.findByIdAndDelete(id);
-    const lists = await List.find({ "tasks.id": id });
+    const [task] = await db.delete(Task).where(eq(Task.id, id)).returning()
+    // Task.findByIdAndDelete(id);
+    // const lists = await List.find({ "tasks.id": id });
 
-    await Promise.all(lists.map(async (list) => {
-      await List.findByIdAndUpdate(list._id, { $pull: { tasks: { id: id } } });
-    }));
+    // await Promise.all(lists.map(async (list) => {
+    //   await List.findByIdAndUpdate(list._id, { $pull: { tasks: { id: id } } });
+    // }));
 
     if (!task) return res.status(404).json({ message: "Task not found" });
     res.status(200).json({ message: "Task deleted successfully" });

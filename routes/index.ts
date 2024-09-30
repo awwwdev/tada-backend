@@ -1,9 +1,9 @@
 import express from 'express';
-import listRouter from './list.route';
-import taskRouter from './task.route';
-import folderRouter from './folder.route';
-import authRouter from './auth.route';
-import settingsRouter from './settings.router';
+import listRouter from '../routes/list.route';
+import taskRouter from '../routes/task.route';
+import folderRouter from '../routes/folder.route';
+import authRouter from '../routes/auth.route';
+import settingsRouter from '../routes/settings.router';
 
 
 const router = express.Router();
