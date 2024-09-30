@@ -2,9 +2,16 @@
 // Schema
 
 
-import { integer, pgTable, serial, text, boolean, uuid, timestamp } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, text, boolean, uuid, timestamp, json } from 'drizzle-orm/pg-core';
 import { User } from './user.model';
 import { Folder } from './folder.model';
+
+type Filters = {
+  deleted?: boolean;
+  archived?: boolean;
+  starred?: boolean;
+  pinned?:  boolean;
+};
 
 export const List = pgTable('list', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -17,6 +24,7 @@ export const List = pgTable('list', {
   folderId: uuid('folder_id').references(() => Folder.id),
   show: boolean('show'),
   orderInFolder: integer('order_in_panel'),
+  // filters: json('filters').$type<Filters>().default({})
 });
 
 

@@ -12,6 +12,5 @@ router.use('/auth/', authRouter);
 router.use('/folders', folderRouter);
 router.use('/lists', listRouter);
 router.use('/tasks', taskRouter);
-router.use('/settings', settingsRouter);
 
 export default router;

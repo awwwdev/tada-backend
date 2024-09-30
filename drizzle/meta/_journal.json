@@ -36,6 +36,13 @@
       "when": 1727630176652,
       "tag": "0004_sour_kabuki",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1727686288572,
+      "tag": "0005_volatile_romulus",
+      "breakpoints": true
     }
   ]
 }

@@ -2,7 +2,7 @@
 import { isEmail } from 'validator';
 
 
-import { integer, pgTable, serial, text, uuid, customType, timestamp   } from 'drizzle-orm/pg-core';
+import { integer, pgTable, serial, text, uuid, customType, timestamp, json   } from 'drizzle-orm/pg-core';
 // import * as x from 'drizzle-orm/
 
 const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
@@ -10,6 +10,11 @@ const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
     return "bytea";
   },
 });
+
+type Settings = {
+  showCompletedTasks?: boolean;
+  theme?: 'light' | 'dark' | 'system';
+};
 
 
 export const User = pgTable('user', {
@@ -20,6 +25,8 @@ export const User = pgTable('user', {
   email: text('email').unique().notNull(),
 	passwordHash: bytea('password_hash').notNull(),
 	salt: bytea('salt').notNull(),
+  settings: json('settings').$type<Settings>().default({ theme: 'system' , showCompletedTasks: true }),
+
 });
 
 export type UserInsert = typeof User.$inferInsert;

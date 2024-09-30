@@ -4,6 +4,7 @@
 
 import { integer, pgTable, serial, text , boolean, pgEnum, uuid ,timestamp, AnyPgColumn } from 'drizzle-orm/pg-core';
 import { User } from './user.model';
+import { List } from './list.model';
 
 export const TaskStatusEnum = pgEnum('task_status', ['to-do', 'done']);
 
@@ -23,6 +24,7 @@ export const Task = pgTable('task', {
   archived: boolean('archived').default(false),
   stepOf: uuid('step_of').references((): AnyPgColumn => Task.id),
   stepIndex: integer('step_index'),
+listId: uuid('list_id').references(() => List.id),
 });
 
 export type TaskInsert = typeof Task.$inferInsert;
