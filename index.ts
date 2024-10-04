@@ -44,13 +44,19 @@ type aa = pgSession.PGStoreOptions
 app.use(
   session({
     secret: config().SESSION_SECRET_KEY,
-    resave: false,
+  resave: false,
     saveUninitialized: true,
+    // cookie: {
+    //   sameSite: 'lax',
+    //   maxAge: 60 * 60 * 24 * 30,
+    //   secure: true,
+    // },
     store: new pgSessionStore({
       // pool: ??? // IMPROVE use pool 
       tableName: 'sessions',
       conString: config().POSTGRESQL_CONNECTION_STRING,
       createTableIfMissing: true,
+      
     }),
   })
 );
