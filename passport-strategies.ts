@@ -4,6 +4,7 @@ import { eq } from 'drizzle-orm';
 import ERRORS from './errors';
 import { User } from './models/user.model';
 import getDBClient from './db/client';
+import bcrypt from 'bcrypt'
 
 type Callback = (error: Error | null, user?: any | null, options?: any) => void;
 
@@ -21,9 +22,17 @@ export const localStrategy = new Strategy(options, async function verify(
     if (!user) {
       return done(null, false, ERRORS.INVALID_CREDENTIALS);
     }
+    
+    // if (await bcrypt.compare(user.passwordHash , password)) {
+    //   const { salt, passwordHash, ...userWithoutSensitiveData } = user;
+    //   return done(null, userWithoutSensitiveData);
+    // } else {
+    //     return done(null, false, ERRORS.INVALID_CREDENTIALS);
+    //   }
+
     crypto.pbkdf2(password, user.salt, 310000, 32, 'sha256', (err, hashedPassword) => {
       if (err) return done(err);
-      if (!crypto.timingSafeEqual(Buffer.from(user.passwordHash), hashedPassword)) {
+      if (!crypto.timingSafeEqual(user.passwordHash, hashedPassword)) {
         return done(null, null, ERRORS.INVALID_CREDENTIALS);
       }
       const { salt, passwordHash, ...userWithoutSensitiveData } = user;
@@ -33,11 +42,4 @@ export const localStrategy = new Strategy(options, async function verify(
     return done(error as Error);
   }
 });
-
-
-//  = {
-//   id: string;
-//   email: string;
-//   username: string;
-// }
 

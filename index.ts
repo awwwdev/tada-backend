@@ -39,12 +39,12 @@ app.use(express.urlencoded({ extended: false }));
 
 const pgSessionStore = pgSession(session);
 
-type aa = pgSession.PGStoreOptions
+type aa = pgSession.PGStoreOptions;
 
 app.use(
   session({
     secret: config().SESSION_SECRET_KEY,
-  resave: false,
+    resave: false,
     saveUninitialized: true,
     // cookie: {
     //   sameSite: 'lax',
@@ -52,11 +52,10 @@ app.use(
     //   secure: true,
     // },
     store: new pgSessionStore({
-      // pool: ??? // IMPROVE use pool 
+      // pool: ??? // IMPROVE use pool
       tableName: 'sessions',
       conString: config().POSTGRESQL_CONNECTION_STRING,
       createTableIfMissing: true,
-      
     }),
   })
 );

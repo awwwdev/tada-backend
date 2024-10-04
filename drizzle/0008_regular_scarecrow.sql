@@ -1,0 +1,2 @@
+ALTER TABLE "task" ALTER COLUMN "task_status" SET DEFAULT 'to-do';--> statement-breakpoint
+ALTER TABLE "user" ALTER COLUMN "settings" SET DEFAULT '{"theme":"system","showCompletedTasks":true,"startOfWeek":"sunday"}'::json;

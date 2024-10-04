@@ -57,6 +57,13 @@
       "when": 1727701512687,
       "tag": "0007_dark_living_lightning",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1728034862617,
+      "tag": "0008_regular_scarecrow",
+      "breakpoints": true
     }
   ]
 }
