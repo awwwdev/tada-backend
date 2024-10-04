@@ -1,31 +1,33 @@
-import express, { Express, Request, Response, Application } from 'express';
+import express, { Request, Response, Application } from 'express';
 import cors from 'cors';
-import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+// import mongoose from 'mongoose';
 import session from 'express-session';
 import passport from 'passport';
 import { User } from './models/user.model';
-import MongoStore from 'connect-mongo';
+// import MongoStore from 'connect-mongo';
 import { localStrategy } from './passport-strategies';
 import flash from 'express-flash';
 import morgan from 'morgan';
+import pgSession from 'connect-pg-simple';
 import router from './routes';
-
-//For env File
-dotenv.config();
+import { eq } from 'drizzle-orm';
+import getDBClient from './db/client';
+import config from './config';
 
 const app: Application = express();
-const port = process.env.PORT || 8000;
+const port = config().PORT;
+// create connection to database
+const db = getDBClient();
 
 // const db = mongoose.connection;
 
 const corsOptions = {
-  origin: process.env.FRONTEND_URL,
+  origin: config().FRONTEND_URL,
   optionsSuccessStatus: 200,
   credentials: true,
 };
 
-app.use(morgan("tiny"));
+app.use(morgan('tiny'));
 app.options('*', cors(corsOptions));
 app.use(cors(corsOptions));
 
@@ -35,18 +37,23 @@ app.use(express.urlencoded({ extended: false }));
 
 // need cookieParser middleware before we can do anything with cookies
 
+const pgSessionStore = pgSession(session);
 
-const SESSION_SECRET_KEY = process.env.SESSION_SECRET_KEY || "the flying elephant";
+type aa = pgSession.PGStoreOptions
 
 app.use(
   session({
-    secret: SESSION_SECRET_KEY,
+    secret: config().SESSION_SECRET_KEY,
     resave: false,
     saveUninitialized: true,
-    store: new MongoStore({ mongoUrl: process.env.MONGODB_URL }),
+    store: new pgSessionStore({
+      // pool: ??? // IMPROVE use pool 
+      tableName: 'sessions',
+      conString: config().POSTGRESQL_CONNECTION_STRING,
+      createTableIfMissing: true,
+    }),
   })
 );
-
 
 app.use(flash());
 passport.use(localStrategy);
@@ -54,7 +61,7 @@ passport.use(localStrategy);
 passport.serializeUser((user: Express.User, next: Next) => {
   process.nextTick(() => {
     // @ts-ignore
-    next(null, user._id);
+    next(null, user.id);
   });
 });
 
@@ -63,8 +70,8 @@ type Next = (error: Error | null, user?: any | null, options?: any) => void;
 
 passport.deserializeUser(async function (userId: SerializedUser, next: Next) {
   try {
-    const userObj = await User.findById(userId);
-    process.nextTick(() => next(null, userObj));
+    const [user] = await db.select().from(User).where(eq(User.id, userId));
+    process.nextTick(() => next(null, user));
   } catch (err) {
     return next(err instanceof Error ? err : new Error('Internal Server Error: ' + err));
   }
@@ -76,18 +83,26 @@ app.use(passport.session()); // attaches user object to request
 // routes
 app.use('/api/v0', router);
 
-mongoose
-  .connect(process.env.MONGODB_URL ?? '')
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(port, () => {
-      console.log(`Server is Fire at http://localhost:${port}`);
-    });
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+app.listen(port, () => {
+  console.log(`Server is Fire at http://localhost:${port}`);
+});
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to Express & TypeScript Server');
+  res.send('Welcome to TADA Server');
 });
+
+// mongoose
+//   .connect(process.env.MONGODB_URL ?? '')
+//   .then(() => {
+//     console.log('Connected to MongoDB');
+//     app.listen(port, () => {
+//       console.log(`Server is Fire at http://localhost:${port}`);
+//     });
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
+
+// app.get('/', (req: Request, res: Response) => {
+//   res.send('Welcome to Express & TypeScript Server');
+// });

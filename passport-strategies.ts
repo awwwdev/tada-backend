@@ -1,10 +1,13 @@
 import { Strategy } from 'passport-local';
-import { User } from './models/user.model';
 import crypto from 'crypto';
+import { eq } from 'drizzle-orm';
 import ERRORS from './errors';
+import { User } from './models/user.model';
+import getDBClient from './db/client';
 
 type Callback = (error: Error | null, user?: any | null, options?: any) => void;
 
+const db = getDBClient();
 
 const options = { usernameField: 'email' };
 export const localStrategy = new Strategy(options, async function verify(
@@ -13,16 +16,17 @@ export const localStrategy = new Strategy(options, async function verify(
   done: Callback
 ) {
   try {
-    const user = await User.findOne({ email }).select('+passwordHash').select('+salt');
+    const [user] = await db.select().from(User).where(eq(User.email, email))
+    //  .findOne({ email }).select('+passwordHash').select('+salt');
     if (!user) {
       return done(null, false, ERRORS.INVALID_CREDENTIALS);
     }
     crypto.pbkdf2(password, user.salt, 310000, 32, 'sha256', (err, hashedPassword) => {
       if (err) return done(err);
-      if (!crypto.timingSafeEqual(user.passwordHash, hashedPassword)) {
+      if (!crypto.timingSafeEqual(Buffer.from(user.passwordHash), hashedPassword)) {
         return done(null, null, ERRORS.INVALID_CREDENTIALS);
       }
-      const { salt, passwordHash, ...userWithoutSensitiveData } = user.toObject();
+      const { salt, passwordHash, ...userWithoutSensitiveData } = user;
       return done(null, userWithoutSensitiveData); // puts this user object into the session.
     });
   } catch (error) {

@@ -1,9 +1,12 @@
 import express from 'express';
 import passport, { AuthenticateCallback } from 'passport';
 import crypto from 'crypto';
-import { TUser, User } from '../models/user.model';
 import { ensureLoggedIn } from 'connect-ensure-login';
+import { User } from '../models/user.model';
 import ERRORS from '../errors';
+import getDBClient from '../db/client';
+
+const db = getDBClient();
 
 /* Configure password authentication strategy.
  *
@@ -81,23 +84,29 @@ authRouter.post('/logout', (req, res, next) => {
 });
 
 authRouter.post('/signup', function (req, res, next) {
-  var salt = crypto.randomBytes(16);
+  const salt = crypto.randomBytes(16);
   crypto.pbkdf2(req.body.password, salt, 310000, 32, 'sha256', async (err, hashedPassword) => {
     if (err) return next(err);
 
     try {
-      const user = await User.create({
-        // username: req.body.username,
+      const [user] = await db.insert(User).values({
+        username: req.body.username,
         email: req.body.email,
         passwordHash: hashedPassword,
-        salt: salt,
-      });
+        salt
+      }).returning()
+      // User.create({
+      //   // username: req.body.username,
+      //   email: req.body.email,
+      //   passwordHash: hashedPassword,
+      //   salt: salt,
+      // });
       req.login(user, (err) => {
         if (err) return next(err);
         // res.redirect('/');
 
         // @ts-ignore
-        const { salt, passwordHash, ...userWithoutSensitiveData } = user._doc;
+        const { salt, passwordHash, ...userWithoutSensitiveData } = user;
         res.json({ message: 'User created successfully', user: userWithoutSensitiveData });
       });
     } catch (error) {

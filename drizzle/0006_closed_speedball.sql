@@ -1,0 +1,1 @@
+ALTER TABLE "user" ADD COLUMN "settings" json DEFAULT '{"theme":"system","showCompletedTasks":true}'::json;

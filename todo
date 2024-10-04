@@ -1,5 +1,8 @@
-CORS
+zod validaation
 authorization for update and delete and add
+RLS
+single to throw
+tests
 
 smae structure for all response json messages
 
@@ -8,3 +11,10 @@ things learnd
 
 SQL >>>>>> No-SQL
 transaction are overhead
+
+
+
+/task/id
+/task/id?with-lists=true
+list/id?with-tasks=true
+folders/id?with-lists=true
