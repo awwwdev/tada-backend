@@ -54,7 +54,6 @@ export const updateTask = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    console.log("🚀 ~ req:", req.body)
     const [task] = await db.update(Task).set(req.body).where(eq(Task.id, id)).returning();
     //  Task.findByIdAndUpdate(id, req.body);
 

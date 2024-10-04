@@ -14,6 +14,7 @@ const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
 type Settings = {
   showCompletedTasks?: boolean;
   theme?: 'light' | 'dark' | 'system';
+  startOfWeek?: 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
 };
 
 
@@ -25,7 +26,7 @@ export const User = pgTable('user', {
   email: text('email').unique().notNull(),
 	passwordHash: bytea('password_hash').notNull(),
 	salt: bytea('salt').notNull(),
-  settings: json('settings').$type<Settings>().default({ theme: 'system' , showCompletedTasks: true }),
+  settings: json('settings').$type<Settings>().default({ theme: 'system' , showCompletedTasks: true, startOfWeek: 'sunday' }),
 
 });
 

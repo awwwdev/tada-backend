@@ -1,5 +1,4 @@
-// start_of_weekexport { WeekdaysEnum } from './models/settings.model';
-// export { TaskStatusEnum } from './models/task.model';
+export { TaskStatusEnum } from '../models/task.model';
 export { User } from '../models/user.model';
 export { Folder } from '../models/folder.model';
 export { List } from '../models/list.model';
