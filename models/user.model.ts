@@ -1,13 +1,11 @@
-// import mongoose, { HydratedDocument, InferRawDocType } from 'mongoose';
-import { isEmail } from 'validator';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
-
-import { integer, pgTable, serial, text, uuid, customType, timestamp, json   } from 'drizzle-orm/pg-core';
+import {  pgTable,  text, uuid, customType, timestamp, json } from 'drizzle-orm/pg-core';
 // import * as x from 'drizzle-orm/
 
 const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
   dataType() {
-    return "bytea";
+    return 'bytea';
   },
 });
 
@@ -17,77 +15,39 @@ type Settings = {
   startOfWeek?: 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
 };
 
-
 export const User = pgTable('user', {
-	id: uuid('id').primaryKey().defaultRandom(),
-	createdAt: timestamp('created_at').notNull().defaultNow(),
-	updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
-	username: text('username').unique(),
+  id: uuid('id').primaryKey().defaultRandom(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
+  username: text('username').unique(),
   email: text('email').unique().notNull(),
-	passwordHash: bytea('password_hash').notNull(),
-	salt: bytea('salt').notNull(),
-  settings: json('settings').$type<Settings>().default({ theme: 'system' , showCompletedTasks: true, startOfWeek: 'sunday' }),
-
+  passwordHash: bytea('password_hash').notNull(),
+  salt: bytea('salt').notNull(),
+  settings: json('settings')
+    .$type<Settings>()
+    .default({ theme: 'system', showCompletedTasks: true, startOfWeek: 'sunday' }),
 });
 
 export type UserInsert = typeof User.$inferInsert;
 export type UserSelect = typeof User.$inferSelect;
 
-// const Schema = mongoose.Schema;
+export const selectUserSchema = createSelectSchema(User);
 
-// const schemaDefinition = {
-//   // username: {
-//   //   type: String,
-//   //   required: false,
-//   //   unique: true,
-//   // },
-//   folders: [
-//     {
-//       id: { type: Schema.ObjectId, ref: 'Folder' },
-//       name: { type: String, required: true },
-//     },
-//   ],
-//   email: {
-//     type: String,
-//     required: true,
-//     unique: true,
-//     validate: {
-//       validator: function (value: string) {
-//         return isEmail(value);
-//       },
-//       message: 'Invalid email.',
-//     },
-//   },
-//   passwordHash: {
-//     type: Buffer,
-//     required: true,
-//     select: false,
-//   },
-//   salt: { type: Buffer, required: true, select: false },
-//   settings: {
-//     startOfWeek: {
-//       type: String,
-//       required: true,
-//       default: 'sunday',
-//       enum: ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
-//     },
-//     showCompletedTasks: {
-//       type: Boolean,
-//       required: true,
-//       default: false,
-//     },
-//     theme: {
-//       type: String,
-//       required: true,
-//       default: 'system',
-//       enum: ['light', 'dark', 'system'],
-//     },
-//   },
-// } as const;
-// const UserSchema = new Schema(schemaDefinition, { timestamps: true });
-// UserSchema.set('toJSON', {
-//   virtuals: true,
-// });
-// export const UserOLD = mongoose.model('User', UserSchema);
-// export type TUserRaw = InferRawDocType<typeof schemaDefinition>;
-// export type TUser = HydratedDocument<TUserRaw>;
+export const insertUserSchema = createInsertSchema(User, {
+  email: (schema) => schema.email.email('Please provide a valid email.'),
+  username: (schema) =>
+    schema.username
+      .min(3, 'Username must be at least 3 characters long.')
+      .max(25, 'Username must be at most 25 characters long.'),
+});
+
+// Usage
+
+const user = insertUserSchema.parse({
+  name: 'John Doe',
+  email: 'johndoe@test.com',
+  role: 'admin',
+});
+
+// Zod schema type is also inferred from the table schema, so you have full type safety
+// const requestSchema = insertUserSchema.pick({ name: true, email: true });

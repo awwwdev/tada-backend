@@ -1,0 +1,1 @@
+ALTER TABLE "list" ADD COLUMN "theme" json DEFAULT '{}'::json;

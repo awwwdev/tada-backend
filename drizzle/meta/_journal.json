@@ -64,6 +64,13 @@
       "when": 1728034862617,
       "tag": "0008_regular_scarecrow",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1728810287361,
+      "tag": "0009_thankful_micromax",
+      "breakpoints": true
     }
   ]
 }

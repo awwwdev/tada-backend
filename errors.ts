@@ -35,6 +35,10 @@ const ERRORS = {
     code: 401,
     message: 'Not authenticated',
   },
+  INTERNAL_SERVER_ERROR: {
+    code: 500,
+    message: 'Internal server error',
+  },
 };
 
 export default ERRORS;

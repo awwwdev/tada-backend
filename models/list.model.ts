@@ -1,6 +1,4 @@
-// import { HydratedDocument, InferRawDocType, Schema, model } from 'mongoose';
-// Schema
-
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
 import { integer, pgTable, serial, text, boolean, uuid, timestamp, json } from 'drizzle-orm/pg-core';
 import { User } from './user.model';
@@ -13,18 +11,26 @@ type Filters = {
   pinned?:  boolean;
 };
 
+type ListTheme = {
+  deleted?: boolean;
+  archived?: boolean;
+  starred?: boolean;
+  pinned?:  boolean;
+};
+
+
 export const List = pgTable('list', {
   id: uuid('id').primaryKey().defaultRandom(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
   name: text('name').notNull(),
-  emojies: text('emojies').array(),
+  emojis: text('emojis').array(),
   authorId: uuid('author_id').references(() => User.id),
   description: text('description'),
   folderId: uuid('folder_id').references(() => Folder.id),
   show: boolean('show'),
   orderInFolder: integer('order_in_panel'),
-  // filters: json('filters').$type<Filters>().default({})
+  theme: json('theme').$type<ListTheme>().default({})
 });
 
 
@@ -33,25 +39,25 @@ export type ListSelect = typeof List.$inferSelect;
 
 
 
-// const schemaDefinition = {
-//   name: { type: String, required: true },
-//   emojies: [{ type: String, required: false }],
-//   author: { type: Schema.ObjectId, required: true, ref: 'User' },
-//   description: { type: String, required: false },
-//   folderId: { type: Schema.ObjectId, required: false, ref: 'Folder' },
-//   tasks: [
-//     {
-//       id: { type: Schema.ObjectId, ref: 'Task' },
-//       task: { type: Schema.ObjectId, ref: 'Task' },
-//       orderInList: { type: Number, required: false },
-//       addedAt: { type: Date, required: true },
-//     },
-//   ],
-// } as const;
-// export const ListScehma = new Schema(schemaDefinition, { timestamps: true });
-// ListScehma.set('toJSON', {
-//   virtuals: true,
-// });
-// export const ListOLD = model('List', ListScehma);
-// export type TListRaw = InferRawDocType<typeof schemaDefinition>;
-// export type TList = HydratedDocument<TListRaw>;
+
+
+// Schema for selecting a user - can be used to validate API responses
+const selectUserSchema = createSelectSchema(List);
+
+
+// Refining the fields - useful if you want to change the fields before they become nullable/optional in the final schema
+const insertUserSchema = createInsertSchema(List, {
+  theme: (schema) => schema.theme.json()
+});
+
+// Usage
+
+const user = insertUserSchema.parse({
+  name: 'John Doe',
+  email: 'johndoe@test.com',
+  role: 'admin',
+});
+
+// Zod schema type is also inferred from the table schema, so you have full type safety
+const requestSchema = insertUserSchema.pick({ name: true, email: true });
+

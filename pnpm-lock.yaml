@@ -38,6 +38,9 @@ dependencies:
   drizzle-orm:
     specifier: ^0.33.0
     version: 0.33.0(pg@8.13.0)(postgres@3.4.4)
+  drizzle-zod:
+    specifier: ^0.5.1
+    version: 0.5.1(drizzle-orm@0.33.0)(zod@3.23.8)
   express:
     specifier: ^4.21.0
     version: 4.21.0
@@ -1425,6 +1428,16 @@ packages:
     dependencies:
       pg: 8.13.0
       postgres: 3.4.4
+    dev: false
+
+  /drizzle-zod@0.5.1(drizzle-orm@0.33.0)(zod@3.23.8):
+    resolution: {integrity: sha512-C/8bvzUH/zSnVfwdSibOgFjLhtDtbKYmkbPbUCq46QZyZCH6kODIMSOgZ8R7rVjoI+tCj3k06MRJMDqsIeoS4A==}
+    peerDependencies:
+      drizzle-orm: '>=0.23.13'
+      zod: '*'
+    dependencies:
+      drizzle-orm: 0.33.0(pg@8.13.0)(postgres@3.4.4)
+      zod: 3.23.8
     dev: false
 
   /dynamic-dedupe@0.3.0:
@@ -2859,3 +2872,7 @@ packages:
   /yn@3.1.1:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
     engines: {node: '>=6'}
+
+  /zod@3.23.8:
+    resolution: {integrity: sha512-XBx9AXhXktjUqnepgTiE5flcKIYWi/rme0Eaj+5Y0lftuGBq+jyRu/md4WnuxqgP1ubdpNCsYEYPxrzVHD8d6g==}
+    dev: false

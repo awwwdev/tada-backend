@@ -8,43 +8,8 @@ import getDBClient from '../db/client';
 
 const db = getDBClient();
 
-/* Configure password authentication strategy.
- *
- * The `LocalStrategy` authenticates users by verifying a username and password.
- * The strategy parses the username and password from the request and calls the
- * `verify` function.
- *
- * The `verify` function queries the database for the user record and verifies
- * the password by hashing the password supplied by the user and comparing it to
- * the hashed password stored in the database.  If the comparison succeeds, the
- * user is authenticated; otherwise, not.
- */
 
 const authRouter = express.Router();
-
-// function authMiddleware(req, res, next) {
-//   passport.authenticate('local', (err: Error, user: Express.User, info: any, status: any) => {
-//     if (err) return next(err);
-//     if (!user) return res.json({ message: 'Not Authenticated' });
-//     res.json({ message: 'Authenticated' });
-//   });
-// }
-
-// authRouter.post('/login/password', (req, res, next) => {
-//   passport.authenticate('local', (err: Error, user: Express.User, info: any, status: any) => {
-//     if (err) return next(err);
-//     if (!user) return res.json({ message: 'Not Authenticated' });
-//     res.json({ message: 'Authenticated' });
-//   })(req, res, next);
-// });
-// authRouter.post(
-//   '/login/with-password',
-//   passport.authenticate('local', {
-//     successRedirect: '/api/v0/auth/login-success',
-//     failureRedirect: '/api/v0/auth/login-failed',
-//     failureFlash: true
-//   })
-// );
 
 authRouter.post(
   '/login/with-password',
