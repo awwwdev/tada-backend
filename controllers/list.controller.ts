@@ -1,6 +1,6 @@
 // const Product = require("../models/product.model");
 import { eq } from 'drizzle-orm';
-import { List } from "../models/list.model";
+import { List, ListSchemas } from "../models/list.model";
 import type { Request, Response } from 'express';
 import getDBClient from '../db/client';
 
@@ -30,11 +30,11 @@ export const getList = async (req: Request, res: Response) => {
 
 export const createList = async (req: Request, res: Response) => {
   try {
+    ListSchemas.insert.parse(req.body);
     const [list] = await db.insert(List).values(req.body).returning();
     //  List.create(req.body);
     res.status(200).json(list);
   } catch (error) {
-    console.log("🚀 ~ error:", error)
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
 };
@@ -42,7 +42,7 @@ export const createList = async (req: Request, res: Response) => {
 export const updateList = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-
+    const x = ListSchemas.update.parse(req.body);
     const [list] = await db.update(List).set(req.body).where(eq(List.id, id)).returning();
     // List.findByIdAndUpdate(id, req.body);
 

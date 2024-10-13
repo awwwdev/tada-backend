@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
-import { integer, pgTable, serial, text, boolean, uuid, timestamp, json } from 'drizzle-orm/pg-core';
+import { integer, pgTable,  text, boolean, uuid, timestamp, json } from 'drizzle-orm/pg-core';
 import { User } from './user.model';
 import { Folder } from './folder.model';
 
@@ -29,7 +29,7 @@ export const List = pgTable('list', {
   description: text('description'),
   folderId: uuid('folder_id').references(() => Folder.id),
   show: boolean('show'),
-  orderInFolder: integer('order_in_panel'),
+  orderInFolder: integer('order_in_folder'),
   theme: json('theme').$type<ListTheme>().default({})
 });
 
@@ -46,18 +46,9 @@ const selectUserSchema = createSelectSchema(List);
 
 
 // Refining the fields - useful if you want to change the fields before they become nullable/optional in the final schema
-const insertUserSchema = createInsertSchema(List, {
-  theme: (schema) => schema.theme.json()
-});
+export const ListSchemas =  { 
+  insert:  createInsertSchema(List).strict(),
+  update:  createInsertSchema(List).omit({id: true}).strict(),
+} 
 
-// Usage
-
-const user = insertUserSchema.parse({
-  name: 'John Doe',
-  email: 'johndoe@test.com',
-  role: 'admin',
-});
-
-// Zod schema type is also inferred from the table schema, so you have full type safety
-const requestSchema = insertUserSchema.pick({ name: true, email: true });
 
