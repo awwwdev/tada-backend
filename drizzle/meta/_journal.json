@@ -71,6 +71,20 @@
       "when": 1728810287361,
       "tag": "0009_thankful_micromax",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1728813988615,
+      "tag": "0010_light_firelord",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1728815249393,
+      "tag": "0011_cold_changeling",
+      "breakpoints": true
     }
   ]
 }
