@@ -4,6 +4,7 @@ import { User, userUpdateSchema } from '../models/user.model';
 import getDBClient from '../db/client';
 import { createProtectedHandler } from '@/utils/createHandler';
 import { z } from 'zod';
+import { singleOrThrow } from '@/db/utils';
 
 const db = getDBClient();
 
@@ -20,7 +21,7 @@ export const getUser = createProtectedHandler(
   , async (req, res) => {
     try {
       const { id } = req.params;
-      const [user] = await db.select().from(User).where(eq(User.id, id)); //TODO signle or throw error
+      const user = await db.select().from(User).where(eq(User.id, id)).then(singleOrThrow); //TODO signle or throw error
       //  User.findById(id).populate('folders');
       res.status(200).json(user);
     } catch (error) {
@@ -38,7 +39,7 @@ export const updateUser = createProtectedHandler(
     try {
       const { id } = req.params;
 
-      const [user] = await db.update(User).set(req.body).where(eq(User.id, id)).returning();
+      const user = await db.update(User).set(req.body).where(eq(User.id, id)).returning().then(singleOrThrow);
       // .findByIdAndUpdate(id, req.body);
 
       if (!user) {
@@ -62,7 +63,7 @@ export const updateSettings = createProtectedHandler(
     try {
       const { id } = req.params;
 
-      const [user] = await db.update(User).set({ settings: req.body }).where(eq(User.id, id)).returning();
+      const user = await db.update(User).set({ settings: req.body }).where(eq(User.id, id)).returning().then(singleOrThrow);
 
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
@@ -83,7 +84,7 @@ export const deleteUser = createProtectedHandler(
     try {
       const { id } = req.params;
 
-      const [user] = await db.delete(User).where(eq(User.id, id)).returning();
+      const user = await db.delete(User).where(eq(User.id, id)).returning().then(singleOrThrow);
 
       if (!user) {
         return res.status(404).json({ message: 'User not found' });

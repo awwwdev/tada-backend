@@ -2,7 +2,7 @@ authorization for update and delete and add
 ✅ zod validaation
 CASL - implement one example ✅ 
 RLS - implement one example
-single to throw 
+single or throw 
 
 import frontend types from backend
 

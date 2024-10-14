@@ -4,6 +4,7 @@ import { Folder, folderCreateSchema, folderUpdateSchema } from '../models/folder
 import getDBClient from '../db/client';
 import { createProtectedHandler } from '@/utils/createHandler';
 import { z } from 'zod';
+import { singleOrThrow } from '@/db/utils';
 
 const db = getDBClient();
 
@@ -26,7 +27,7 @@ export const getFolder = createProtectedHandler(
   async (req, res) => {
     try {
       const { id } = req.params;
-      const [folder] = await db.select().from(Folder).where(eq(Folder.id, id));
+      const folder = await db.select().from(Folder).where(eq(Folder.id, id)).then(singleOrThrow);
       // Folder.findById(id).populate('author').populate('lists');
       res.status(200).json(folder);
     } catch (error) {
@@ -39,7 +40,7 @@ export const createFolder = createProtectedHandler(
   z.object({ params: z.object({ id: z.string() }), body: folderCreateSchema }),
   async (req, res) => {
     try {
-      const [folder] = await db.insert(Folder).values(req.body).returning();
+      const folder = await db.insert(Folder).values(req.body).returning().then(singleOrThrow);
       res.status(200).json(folder);
     } catch (error) {
       res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
@@ -53,7 +54,7 @@ export const updateFolder = createProtectedHandler(
     try {
       const { id } = req.params;
 
-      const [folder] = await db.update(Folder).set(req.body).where(eq(Folder.id, id)).returning();
+      const folder = await db.update(Folder).set(req.body).where(eq(Folder.id, id)).returning().then(singleOrThrow);
 
       if (!folder) {
         return res.status(404).json({ message: 'Folder not found' });
@@ -73,7 +74,7 @@ export const deleteFolder = createProtectedHandler(
     try {
       const { id } = req.params;
 
-      const [folder] = await db.delete(Folder).where(eq(Folder.id, id)).returning();
+      const folder = await db.delete(Folder).where(eq(Folder.id, id)).returning().then(singleOrThrow);
 
       if (!folder) {
         return res.status(404).json({ message: 'Folder not found' });

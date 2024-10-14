@@ -7,26 +7,27 @@ import { subject } from '@casl/ability';
 import { createProtectedHandler } from '@/utils/createHandler';
 import { defineAbilitiesFor } from '@/access-control/user.access';
 import { z } from 'zod';
+import { singleOrThrow } from '@/db/utils';
 
 const db = getDBClient();
 
 export const getLists = createProtectedHandler(
   z.object({}),
   async (req, res) => {
-  try {
-    // @ts-ignore
-    const lists = await db.select().from(List)
-    //  List.find({ author: req?.user?._id }).populate('author').populate('tasks');;
-    res.status(200).json(lists);
-  } catch (error) {
-    res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
-  }
-});
+    try {
+      // @ts-ignore
+      const lists = await db.select().from(List)
+      //  List.find({ author: req?.user?._id }).populate('author').populate('tasks');;
+      res.status(200).json(lists);
+    } catch (error) {
+      res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
+    }
+  });
 
 export const getList = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) }), async (req, res) => {
   try {
     const { id } = req.params;
-    const [list] = await db.select().from(List).where(eq(List.id, id));
+    const list = await db.select().from(List).where(eq(List.id, id)).then(singleOrThrow);
     // List.findById(id).populate('author').populate('tasks.task');
     res.status(200).json(list);
   } catch (error) {
@@ -41,7 +42,7 @@ export const createList = createProtectedHandler(z.object({ params: z.object({ i
     const hasAccess = ability.can('create', subject('List', req.body))
     if (!hasAccess) throw Error('Unauthorized');
 
-    const [list] = await db.insert(List).values(req.body).returning();
+    const list = await db.insert(List).values(req.body).returning().then(singleOrThrow);
     res.status(200).json(list);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
@@ -54,7 +55,7 @@ export const updateList = createProtectedHandler(z.object({ body: listUpdateSche
     const hasAccess = ability.can('update', subject('List', req.body));
     if (!hasAccess) throw Error('Unauthorized');
     const { id } = req.params;
-    const [list] = await db.update(List).set(req.body).where(eq(List.id, id)).returning();
+    const list = await db.update(List).set(req.body).where(eq(List.id, id)).returning().then(singleOrThrow);
     // List.findByIdAndUpdate(id, req.body);
 
     if (!list) {
@@ -72,7 +73,7 @@ export const deleteList = createProtectedHandler(z.object({ params: z.object({ i
   try {
     const { id } = req.params;
 
-    const [list] = await db.delete(List).where(eq(List.id, id)).returning();
+    const list = await db.delete(List).where(eq(List.id, id)).returning().then(singleOrThrow);
     // List.findByIdAndDelete(id);
 
     if (!list) {
