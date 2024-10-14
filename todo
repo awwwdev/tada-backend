@@ -1,8 +1,9 @@
 authorization for update and delete and add
 ✅ zod validaation
 CASL - implement one example ✅ 
-RLS - implement one example
-single or throw 
+RLS - implement one example (too complicated)
+single or throw  ✅ 
+error messages 
 
 import frontend types from backend
 
@@ -10,7 +11,6 @@ tests
 
 smae structure for all response json messages
 
-error messages 
 
 
 things learnd 

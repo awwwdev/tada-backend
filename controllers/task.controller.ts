@@ -6,6 +6,8 @@ import getDBClient from '../db/client';
 import { createProtectedHandler } from '@/utils/createHandler';
 import { z } from 'zod';
 import { singleOrThrow } from '@/db/utils';
+import { subject } from '@casl/ability';
+import { defineAbilitiesFor } from '@/access-control/user.access';
 
 
 const db = getDBClient();
@@ -13,6 +15,7 @@ const db = getDBClient();
 
 export const getTasks = createProtectedHandler(
   z.object({}),
+  () => true,
   async (req, res) => {
     try {
       const userId = req?.user?.id ?? "";
@@ -29,8 +32,15 @@ export const getTasks = createProtectedHandler(
     }
   });
 
-export const getTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) }), async (req, res) => {
+export const getTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) }),
+(ability, req) => ability.can('read', subject('Task', req.body)),
+async (req, res) => {
   try {
+
+    const ability = defineAbilitiesFor(req.user)
+    const hasAccess = ability.can('read', subject('Task', req.body));
+    if (!hasAccess) throw Error('Unauthorized');
+
     const { id } = req.params;
     const task = await db.select().from(Task).where(eq(Task.id, id)).then(singleOrThrow);
     res.status(200).json(task);
@@ -39,8 +49,14 @@ export const getTask = createProtectedHandler(z.object({ params: z.object({ id: 
   }
 });
 
-export const createTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }), body: taskCreateSchema }), async (req, res) => {
+export const createTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }), body: taskCreateSchema }), 
+(ability, req) => ability.can('create', subject('Task', req.body)),
+async (req, res) => {
   try {
+    const ability = defineAbilitiesFor(req.user)
+    const hasAccess = ability.can('create', subject('Task', req.body));
+    if (!hasAccess) throw Error('Unauthorized');
+
     const task = await db.insert(Task).values(req.body).returning().then(singleOrThrow);
     res.status(200).json(task);
   } catch (error) {
@@ -48,9 +64,22 @@ export const createTask = createProtectedHandler(z.object({ params: z.object({ i
   }
 });
 
-export const updateTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }), body: taskUpdateSchema }), async (req, res) => {
+export const updateTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }), body: taskUpdateSchema }), 
+async (ability , req) => {
+  const { id } = req.params;
+  const currentTask = await db.select().from(Task).where(eq(Task.id, id)).then(singleOrThrow);
+  return ability.can('update', subject('Task', { ...req.body, id: currentTask.id }));
+}, 
+async (req, res) => {
   try {
+
     const { id } = req.params;
+    const currentTask = await db.select().from(Task).where(eq(Task.id, id)).then(singleOrThrow);
+
+    const ability = defineAbilitiesFor(req.user)
+    const hasAccess = ability.can('update', subject('Task', { ...req.body, authorId: currentTask.authorId }));
+    if (!hasAccess) throw Error('Unauthorized');
+
 
     const task = await db.update(Task).set(req.body).where(eq(Task.id, id)).returning().then(singleOrThrow);
 
@@ -64,8 +93,19 @@ export const updateTask = createProtectedHandler(z.object({ params: z.object({ i
   }
 });
 
-export const deleteTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) }), async (req, res) => {
+export const deleteTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) }), 
+async (ability, req) => {
+  const { id } = req.params;
+  const currentTask = await db.select().from(Task).where(eq(Task.id, id)).then(singleOrThrow);
+  return ability.can('delete', subject('Task', { ...req.body, id: currentTask.id }));
+},
+async (req, res) => {
   try {
+
+    const ability = defineAbilitiesFor(req.user)
+    const hasAccess = ability.can('delete', subject('Task', req.body));
+    if (!hasAccess) throw Error('Unauthorized');
+
     const { id } = req.params;
 
     const task = await db.delete(Task).where(eq(Task.id, id)).returning().then(singleOrThrow);

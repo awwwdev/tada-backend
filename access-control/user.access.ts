@@ -9,17 +9,17 @@ export function defineAbilitiesFor(user: UserSelect) {
   const { can, build } = new AbilityBuilder(createMongoAbility);
 
   can('read', 'Folder', { authorId: user.id });
-  can('create', 'Folder', { authorId: user.id });
+  can('create', 'Folder');
   can('update', 'List', { authorId: user.id });
   can('delete', 'List', { authorId: user.id });
 
   can('read', 'List', { authorId: user.id });
-  can('create', 'List', { authorId: user.id });
+  can('create', 'List');
   can('update', 'List', { authorId: user.id });
   can('delete', 'List', { authorId: user.id });
 
   can('read', 'Task', { authorId: user.id });
-  can('create', 'Task', { authorId: user.id });
+  can('create', 'Task');
   can('update', 'Task', { authorId: user.id });
   can('delete', 'Task', { authorId: user.id });
 

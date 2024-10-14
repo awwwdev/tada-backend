@@ -17,8 +17,9 @@ const db = getDBClient();
 // };
 
 export const getUser = createProtectedHandler(
-  z.object({})
-  , async (req, res) => {
+  z.object({}),
+  (ability, req) => req.user.id === req.params.id,
+  async (req, res) => {
     try {
       const { id } = req.params;
       const user = await db.select().from(User).where(eq(User.id, id)).then(singleOrThrow); //TODO signle or throw error
@@ -35,6 +36,7 @@ export const updateUser = createProtectedHandler(
     params: z.object({ id: z.string() }),
     body: userUpdateSchema,
   }),
+  (ability, req) => req.user.id === req.params.id,
   async (req, res) => {
     try {
       const { id } = req.params;
@@ -59,6 +61,7 @@ export const updateSettings = createProtectedHandler(
     params: z.object({ id: z.string() }),
     body: userUpdateSchema.shape.settings,
   }),
+  (ability, req) => req.user.id === req.params.id,
   async (req, res) => {
     try {
       const { id } = req.params;
@@ -80,6 +83,7 @@ export const deleteUser = createProtectedHandler(
   z.object({
     params: z.object({ id: z.string() }),
   }),
+  (ability, req) => req.user.id === req.params.id,
   async (req, res) => {
     try {
       const { id } = req.params;
