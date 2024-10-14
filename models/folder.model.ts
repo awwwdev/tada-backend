@@ -2,8 +2,10 @@
 
 
 
-import { integer, pgTable, serial, text , boolean, uuid , timestamp  } from 'drizzle-orm/pg-core';
+import { integer, pgTable,  text , boolean, uuid , timestamp  } from 'drizzle-orm/pg-core';
 import { User } from './user.model';
+import { createInsertSchema } from 'drizzle-zod';
+import { z } from 'zod';
 
 export const Folder = pgTable('folder', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -20,3 +22,10 @@ export const Folder = pgTable('folder', {
 export type FolderInsert = typeof Folder.$inferInsert;
 export type FolderSelect = typeof Folder.$inferSelect;
 
+const refinements = {
+  emojis: z.array(z.string()).optional(),
+  authorId: z.string().uuid(),
+}
+
+export const folderCreateSchema =  createInsertSchema(Folder, refinements).omit({ id: true, createdAt: true, updatedAt: true }).strict();
+export const folderUpdateSchema =  folderCreateSchema.partial();

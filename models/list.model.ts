@@ -1,4 +1,4 @@
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+import { createInsertSchema } from 'drizzle-zod';
 
 import { integer, pgTable, text, boolean, uuid, timestamp, json } from 'drizzle-orm/pg-core';
 import { User } from './user.model';
@@ -31,11 +31,9 @@ export const List = pgTable('list', {
   theme: json('theme').$type<ListTheme>().default({}),
 });
 
-export type ListInsert = typeof List.$inferInsert;
 export type ListSelect = typeof List.$inferSelect;
 
-
-const refinement = {
+const refinements = {
   theme: z.object({
     hue: z.string().optional(),
     darkMode: z.boolean().optional(),
@@ -43,15 +41,5 @@ const refinement = {
   emojis: z.array(z.string()).optional(),
 }
 
-const selectSchema = createSelectSchema(List, refinement).strict();
-const insertSchema = createSelectSchema(List, refinement).strict();
-
-export const ListValidationSchemas = {
-  create: z.object({
-    body: insertSchema
-  }).strict(),
-  update: z.object({
-    body: insertSchema.omit({ id: true, createdAt: true, updatedAt: true })
-  }),
-};
-
+export const listCreateSchema =  createInsertSchema(List, refinements).omit({ id: true, createdAt: true, updatedAt: true }).strict();
+export const listUpdateSchema =  listCreateSchema.partial();

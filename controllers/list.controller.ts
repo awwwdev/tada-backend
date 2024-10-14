@@ -1,12 +1,12 @@
 // const Product = require("../models/product.model");
 import { eq } from 'drizzle-orm';
-import { List, ListValidationSchemas } from "../models/list.model";
-import type { Request, Response } from 'express';
+import { List, listCreateSchema, listUpdateSchema } from "../models/list.model";
 import getDBClient from '../db/client';
 import { UserSelect } from '@/models/user.model';
 import { subject } from '@casl/ability';
 import { createProtectedHandler } from '@/utils/createHandler';
 import { defineAbilitiesFor } from '@/access-control/user.access';
+import { z } from 'zod';
 
 const db = getDBClient();
 
@@ -21,7 +21,7 @@ export const getLists = createProtectedHandler(async (req, res) => {
   }
 });
 
-export const getList = createProtectedHandler(async (req, res) => {
+export const getList = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) }), async (req, res) => {
   try {
     const { id } = req.params;
     const [list] = await db.select().from(List).where(eq(List.id, id));
@@ -32,7 +32,7 @@ export const getList = createProtectedHandler(async (req, res) => {
   }
 });
 
-export const createList = createProtectedHandler(ListValidationSchemas.create, async (req, res) => {
+export const createList = createProtectedHandler(z.object({ params: z.object({ id: z.string() }), body: listCreateSchema }), async (req, res) => {
   try {
 
     const ability = defineAbilitiesFor(req.user)
@@ -46,13 +46,12 @@ export const createList = createProtectedHandler(ListValidationSchemas.create, a
   }
 });
 
-export const updateList = async (req: Request, res: Response) => {
+export const updateList = createProtectedHandler(z.object({ body: listUpdateSchema, params: z.object({ id: z.string() }) }), async (req, res) => {
   try {
     const ability = defineAbilitiesFor(req.user as UserSelect)
     const hasAccess = ability.can('update', subject('List', req.body));
     if (!hasAccess) throw Error('Unauthorized');
     const { id } = req.params;
-    const x = ListSchemas.update.parse(req.body);
     const [list] = await db.update(List).set(req.body).where(eq(List.id, id)).returning();
     // List.findByIdAndUpdate(id, req.body);
 
@@ -61,14 +60,13 @@ export const updateList = async (req: Request, res: Response) => {
     }
 
     // const updatedList = await List.findById(id).populate('author').populate('tasks.id');
-    console.log("🚀 ~ updatedList:", list)
     res.status(200).json(list);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
-};
+});
 
-export const deleteList = async (req: Request, res: Response) => {
+export const deleteList = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) }), async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -82,4 +80,4 @@ export const deleteList = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
-};
+});

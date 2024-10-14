@@ -1,6 +1,6 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
-import {  pgTable,  text, uuid, customType, timestamp, json } from 'drizzle-orm/pg-core';
+import { pgTable, text, uuid, customType, timestamp, json } from 'drizzle-orm/pg-core';
 // import * as x from 'drizzle-orm/
 
 const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
@@ -31,23 +31,13 @@ export const User = pgTable('user', {
 export type UserInsert = typeof User.$inferInsert;
 export type UserSelect = typeof User.$inferSelect;
 
-export const selectUserSchema = createSelectSchema(User);
 
-export const insertUserSchema = createInsertSchema(User, {
+export const userCreateSchema = createInsertSchema(User, {
   email: (schema) => schema.email.email('Please provide a valid email.'),
   username: (schema) =>
     schema.username
       .min(3, 'Username must be at least 3 characters long.')
       .max(25, 'Username must be at most 25 characters long.'),
-});
+}).omit({ id: true, createdAt: true, updatedAt: true }).strict();
 
-// Usage
-
-const user = insertUserSchema.parse({
-  name: 'John Doe',
-  email: 'johndoe@test.com',
-  role: 'admin',
-});
-
-// Zod schema type is also inferred from the table schema, so you have full type safety
-// const requestSchema = insertUserSchema.pick({ name: true, email: true });
+export const userUpdateSchema = userCreateSchema.partial();

@@ -3,6 +3,7 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { integer, pgTable, serial, text, boolean, pgEnum, uuid, timestamp, AnyPgColumn } from 'drizzle-orm/pg-core';
 import { User } from './user.model';
 import { List } from './list.model';
+import { z } from 'zod';
 
 export const TaskStatusEnum = pgEnum('task_status', ['to-do', 'done']);
 
@@ -28,8 +29,11 @@ export const Task = pgTable('task', {
 export type TaskInsert = typeof Task.$inferInsert;
 export type TaskSelect = typeof Task.$inferSelect;
 
-export const selectUserSchema = createSelectSchema(Task);
+const refinements = {
+  emojis: z.array(z.string()).optional(),
+  authorId: z.string().uuid(),
+  listId: z.string().uuid(),
+}
 
-export const insertUserSchema = createInsertSchema(Task, {
-
-});
+export const taskCreateSchema =  createInsertSchema(Task, refinements).omit({ id: true, createdAt: true, updatedAt: true }).strict();
+export const taskUpdateSchema =  taskCreateSchema.partial();
