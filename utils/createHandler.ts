@@ -3,6 +3,7 @@ import { UserSelect } from '@/models/user.model';
 import { AbilityTuple, MongoAbility, MongoQuery } from '@casl/ability';
 import { type NextFunction, type Request, RequestHandler, type Response } from 'express';
 import type { z } from 'zod';
+import { BackendError } from './errors';
 
 export type ProtectedHandler = (
   req: Omit<Request, 'user'> & { user: UserSelect },
@@ -47,7 +48,9 @@ export function createProtectedHandler<T extends z.ZodType>(
       schema.parse(req);
       const ability = defineAbilitiesFor(req.user)
       const hasAccess = await accessController(ability, req);
-      if (!hasAccess) throw Error('Unauthorized');
+      if (!hasAccess) throw new BackendError('UNAUTHORIZED', {
+        message: "You are not authorized to access this resource",
+      });
 
       await handler(req, res, next);
     } catch (error) {

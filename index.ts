@@ -13,6 +13,7 @@ import router from './routes';
 import { eq } from 'drizzle-orm';
 import getDBClient from './db/client';
 import config from './config';
+import { errorHandler, handle404Error } from './utils/errors';
 
 const app: Application = express();
 const port = config().PORT;
@@ -96,18 +97,6 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to TADA Server');
 });
 
-// mongoose
-//   .connect(process.env.MONGODB_URL ?? '')
-//   .then(() => {
-//     console.log('Connected to MongoDB');
-//     app.listen(port, () => {
-//       console.log(`Server is Fire at http://localhost:${port}`);
-//     });
-//   })
-//   .catch((err) => {
-//     console.log(err);
-//   });
+app.all('*', handle404Error);
 
-// app.get('/', (req: Request, res: Response) => {
-//   res.send('Welcome to Express & TypeScript Server');
-// });
+app.use(errorHandler);

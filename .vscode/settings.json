@@ -20,5 +20,6 @@
   },
   "peacock.color": "#a09541",
   "editor.suggest.showStatusBar": false,
-  "zenMode.hideStatusBar": false
+  "zenMode.hideStatusBar": false,
+  "cSpell.words": ["casl"]
 }
