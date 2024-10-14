@@ -1,16 +1,15 @@
-import express from 'express';
 import { getTasks, getTask, createTask, updateTask, deleteTask } from '../controllers/task.controller';
-import ensureLoggedIn from '../auth/ensureLoggedIn';
-const taskRouter  = express.Router();
+import { createRouter } from '@/utils/createRouter';
 
-taskRouter.get('/', ensureLoggedIn, getTasks);
-taskRouter.get('/:id', ensureLoggedIn, getTask);
-taskRouter.post('/', ensureLoggedIn, createTask);
+export default createRouter((router, protectedRouter) => {
+
+protectedRouter.get('/', getTasks);
+protectedRouter.get('/:id', getTask);
+protectedRouter.post('/', createTask);
 
 // update a Task
-taskRouter.put('/:id', ensureLoggedIn, updateTask);
+protectedRouter.patch('/:id', updateTask);
 
 // delete a Task
-taskRouter.delete('/:id', ensureLoggedIn, deleteTask);
-
-export default taskRouter;
+protectedRouter.delete('/:id', deleteTask);
+})

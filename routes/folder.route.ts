@@ -1,17 +1,17 @@
-import express from 'express';
 import { getFolders, getFolder, createFolder, updateFolder, deleteFolder } from '../controllers/folder.controller';
-import ensureLoggedIn from '../auth/ensureLoggedIn';
-const folderRouter = express.Router();
+import { createRouter } from '@/utils/createRouter';
 
-folderRouter.get('/', ensureLoggedIn, getFolders);
-folderRouter.get('/:id', ensureLoggedIn, getFolder);
-folderRouter.post('/', ensureLoggedIn, createFolder);
+export default createRouter((router, protectedRouter) => {
+  protectedRouter.get('/', getFolders);
+  protectedRouter.get('/:id', getFolder);
+  protectedRouter.post('/', createFolder);
 
-// update a Folder
-folderRouter.put('/:id', ensureLoggedIn, updateFolder);
+  // update a Folder
+  protectedRouter.patch('/:id', updateFolder);
 
-// delete a Folder
-folderRouter.delete('/:id', ensureLoggedIn, deleteFolder);
+  // delete a Folder
+  protectedRouter.delete('/:id', deleteFolder);
+});
 
 
-export default folderRouter;
+

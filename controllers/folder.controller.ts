@@ -3,10 +3,11 @@ import { eq } from 'drizzle-orm';
 import { Folder } from '../models/folder.model';
 import type { Request, Response } from 'express';
 import getDBClient from '../db/client';
+import { createProtectedHandler } from '@/utils/createHandler';
 
 const db = getDBClient();
 
-export const getFolders = async (req: Request, res: Response) => {
+export const getFolders = createProtectedHandler(async (req, res) => {
   try {
     // const filterOptions = req.query.userId ? { author: req.query.userId } : {};
     // @ts-ignore
@@ -16,9 +17,9 @@ export const getFolders = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const getFolder = async (req: Request, res: Response) => {
+export const getFolder = createProtectedHandler(async (req, res) => {
   try {
     const { id } = req.params;
     const [folder] = await db.select().from(Folder).where(eq(Folder.id, id));
@@ -27,18 +28,18 @@ export const getFolder = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const createFolder = async (req: Request, res: Response) => {
+export const createFolder = createProtectedHandler(async (req, res) => {
   try {
     const [folder] = await db.insert(Folder).values(req.body).returning();
     res.status(200).json(folder);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const updateFolder = async (req: Request, res: Response) => {
+export const updateFolder = createProtectedHandler(async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -55,9 +56,9 @@ export const updateFolder = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const deleteFolder = async (req: Request, res: Response) => {
+export const deleteFolder = createProtectedHandler(async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -71,4 +72,4 @@ export const deleteFolder = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});

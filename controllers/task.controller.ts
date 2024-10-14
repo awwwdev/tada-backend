@@ -5,15 +5,14 @@ import type { Request, Response } from 'express';
 import getDBClient from '../db/client';
 import { assertIsLoggedIn } from '../auth/ensureLoggedIn';
 import { UserSelect } from '../models/user.model';
+import { createProtectedHandler } from '@/utils/createHandler';
 
 
 const db = getDBClient();
 
-type LoggedInRequest = Request & { user: UserSelect };
 
-export const getTasks = async (_req: Request, res: Response) => {
+export const getTasks = createProtectedHandler(async (req, res) => {
   try {
-    const req = _req as LoggedInRequest;
     const userId = req?.user?.id ?? "";
     const listId = req.query.listId as string;
 
@@ -27,9 +26,9 @@ export const getTasks = async (_req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const getTask = async (req: Request, res: Response) => {
+export const getTask = createProtectedHandler(async (req, res) => {
   try {
     const { id } = req.params;
     const [task] = await db.select().from(Task).where(eq(Task.id, id));
@@ -38,9 +37,9 @@ export const getTask = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const createTask = async (req: Request, res: Response) => {
+export const createTask = createProtectedHandler(async (req, res) => {
   try {
     const [task] = await db.insert(Task).values(req.body).returning();
     //  Task.create(req.body);
@@ -48,9 +47,9 @@ export const createTask = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const updateTask = async (req: Request, res: Response) => {
+export const updateTask = createProtectedHandler(async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -66,9 +65,9 @@ export const updateTask = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const deleteTask = async (req: Request, res: Response) => {
+export const deleteTask = createProtectedHandler(async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -85,4 +84,4 @@ export const deleteTask = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});

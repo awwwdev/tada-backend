@@ -2,11 +2,11 @@
 import { eq } from 'drizzle-orm';
 import { User } from '../models/user.model';
 import getDBClient from '../db/client';
+import { createProtectedHandler } from '@/utils/createHandler';
 
 const db = getDBClient();
-import type { Request, Response } from 'express';
 
-// export const getUsers = async (req: Request, res: Response) => {
+// export const getUsers = async (req , res) => {
 //   try {
 //     const users = await db.select().from(User)
 //   } catch (error) {
@@ -14,7 +14,7 @@ import type { Request, Response } from 'express';
 //   }
 // };
 
-export const getUser = async (req: Request, res: Response) => {
+export const getUser = createProtectedHandler(async (req , res) => {
   try {
     const { id } = req.params;
     const [user] = await db.select().from(User).where(eq(User.id, id)); //TODO signle or throw error
@@ -23,9 +23,9 @@ export const getUser = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = createProtectedHandler(async (req , res) => {
   try {
     const [user] = await db.insert(User).values(req.body).returning();
 
@@ -34,9 +34,9 @@ export const createUser = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser = createProtectedHandler(async (req , res) => {
   try {
     const { id } = req.params;
 
@@ -52,9 +52,9 @@ export const updateUser = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const updateSettings = async (req: Request, res: Response) => {
+export const updateSettings = createProtectedHandler(async (req , res) => {
   try {
     const { id } = req.params;
 
@@ -68,9 +68,9 @@ export const updateSettings = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = createProtectedHandler(async (req , res) => {
   try {
     const { id } = req.params;
 
@@ -84,4 +84,4 @@ export const deleteUser = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : 'Internal Server Error: ' + error });
   }
-};
+});

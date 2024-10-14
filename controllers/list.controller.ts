@@ -1,12 +1,16 @@
 // const Product = require("../models/product.model");
 import { eq } from 'drizzle-orm';
-import { List, ListSchemas } from "../models/list.model";
+import { List, ListValidationSchemas } from "../models/list.model";
 import type { Request, Response } from 'express';
 import getDBClient from '../db/client';
+import { UserSelect } from '@/models/user.model';
+import { subject } from '@casl/ability';
+import { createProtectedHandler } from '@/utils/createHandler';
+import { defineAbilitiesFor } from '@/access-control/user.access';
 
 const db = getDBClient();
 
-export const getLists = async (req: Request, res: Response) => {
+export const getLists = createProtectedHandler(async (req, res) => {
   try {
     // @ts-ignore
     const lists = await db.select().from(List)
@@ -15,9 +19,9 @@ export const getLists = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
-};
+});
 
-export const getList = async (req: Request, res: Response) => {
+export const getList = createProtectedHandler(async (req, res) => {
   try {
     const { id } = req.params;
     const [list] = await db.select().from(List).where(eq(List.id, id));
@@ -26,21 +30,27 @@ export const getList = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
-};
+});
 
-export const createList = async (req: Request, res: Response) => {
+export const createList = createProtectedHandler(ListValidationSchemas.create, async (req, res) => {
   try {
-    ListSchemas.insert.parse(req.body);
+
+    const ability = defineAbilitiesFor(req.user)
+    const hasAccess = ability.can('create', subject('List', req.body))
+    if (!hasAccess) throw Error('Unauthorized');
+
     const [list] = await db.insert(List).values(req.body).returning();
-    //  List.create(req.body);
     res.status(200).json(list);
   } catch (error) {
     res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error: " + error });
   }
-};
+});
 
 export const updateList = async (req: Request, res: Response) => {
   try {
+    const ability = defineAbilitiesFor(req.user as UserSelect)
+    const hasAccess = ability.can('update', subject('List', req.body));
+    if (!hasAccess) throw Error('Unauthorized');
     const { id } = req.params;
     const x = ListSchemas.update.parse(req.body);
     const [list] = await db.update(List).set(req.body).where(eq(List.id, id)).returning();

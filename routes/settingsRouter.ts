@@ -1,11 +1,10 @@
-import express from 'express';
-import ensureLoggedIn from '../auth/ensureLoggedIn';
 import { updateSettings } from '../controllers/user.controller';
-const settingsrouter = express.Router();
+import { createRouter } from '@/utils/createRouter';
 
 
-settingsrouter.put('/:id', ensureLoggedIn, updateSettings);
+export default createRouter((router, protectedRouter) => {
+  protectedRouter.patch('/:id', updateSettings);
+});
 
 
 
-export default settingsrouter;
