@@ -1,9 +1,9 @@
 import passport from 'passport';
 import crypto from 'crypto';
 import { User } from '../models/user.model';
-import ERRORS from '../errors';
 import getDBClient from '../db/client';
 import { createRouter } from '@/utils/createRouter';
+import { BackendError } from '@/utils/errors';
 
 const db = getDBClient();
 
@@ -31,12 +31,12 @@ export default createRouter((router) => {
   });
 
   router.get('/login-failed', (req, res) => {
-    res.status(401).json(ERRORS.INVALID_CREDENTIALS);
+    throw new BackendError('INVALID_CREDENTIALS')
   });
 
   router.get('/user', (req, res) => {
     if (req.user) return res.json({ message: 'Authenticated', user: req.user });
-    return res.json({ message: ERRORS.NOT_AUTHENTICATED.message });
+    throw new BackendError('NOT_AUTHENTICATED');
   });
 
   router.post('/logout', (req, res, next) => {

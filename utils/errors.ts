@@ -21,17 +21,18 @@ type HttpErrorCode =
   | 'EXPECTATION_FAILED'
   | 'TEAPOT';
 
-type BackendErrorCode = 'VALIDATION_ERROR' | 'USER_NOT_FOUND' | 'INVALID_PASSWORD';
+type BackendErrorCode = 'VALIDATION_ERROR' | 'USER_NOT_FOUND' | 'INVALID_CREDENTIALS';
 
-type ErrorCode = HttpErrorCode | BackendErrorCode | 'INTERNAL_ERROR';
+type ErrorCode = HttpErrorCode | BackendErrorCode | 'INTERNAL_ERROR' | 'NOT_AUTHENTICATED';
 
 export function getStatusFromErrorCode(code: ErrorCode): number {
   switch (code) {
     case 'BAD_REQUEST':
     case 'VALIDATION_ERROR':
       return 400;
+    case 'NOT_AUTHENTICATED':
     case 'UNAUTHORIZED':
-    case 'INVALID_PASSWORD':
+    case 'INVALID_CREDENTIALS':
       return 401;
     case 'NOT_FOUND':
     case 'USER_NOT_FOUND':
@@ -85,7 +86,7 @@ export function getMessageFromErrorCode(code: ErrorCode): string {
       return 'An internal server error occurred.';
     case 'CONFLICT':
       return 'The request conflicts with the current state of the server.';
-    case 'INVALID_PASSWORD':
+    case 'INVALID_CREDENTIALS':
       return 'The password is incorrect.';
     default:
       return 'An internal server error occurred.';

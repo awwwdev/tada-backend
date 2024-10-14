@@ -1,10 +1,8 @@
 import { Strategy } from 'passport-local';
 import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
-import ERRORS from './errors';
 import { User } from './models/user.model';
 import getDBClient from './db/client';
-import bcrypt from 'bcrypt'
 
 type Callback = (error: Error | null, user?: any | null, options?: any) => void;
 
