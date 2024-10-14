@@ -1,9 +1,9 @@
-authorization for update and delete and add
-✅ zod validaation
+authorization for update and delete and add ✅
+zod validaation ✅
 CASL - implement one example ✅ 
 RLS - implement one example (too complicated)
 single or throw  ✅ 
-error messages 
+error messages  ✅ 
 
 import frontend types from backend
 
@@ -17,8 +17,6 @@ things learnd
 
 SQL >>>>>> No-SQL
 transaction are overhead
-
-
 
 /task/id
 /task/id?with-lists=true

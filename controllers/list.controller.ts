@@ -7,6 +7,7 @@ import { createProtectedHandler } from '@/utils/createHandler';
 import { defineAbilitiesFor } from '@/access-control/user.access';
 import { z } from 'zod';
 import { singleOrThrow } from '@/db/utils';
+import { BackendError } from '@/utils/errors';
 
 const db = getDBClient();
 
@@ -67,9 +68,7 @@ export const updateList = createProtectedHandler(
     const list = await db.update(List).set(req.body).where(eq(List.id, id)).returning().then(singleOrThrow);
     // List.findByIdAndUpdate(id, req.body);
 
-    if (!list) {
-      return res.status(404).json({ message: 'List not found' });
-    }
+    if (!list) throw new BackendError('NOT_FOUND', { message: 'List not found.' })
 
     // const updatedList = await List.findById(id).populate('author').populate('tasks.id');
     res.status(200).json(list);
@@ -94,9 +93,8 @@ export const deleteList = createProtectedHandler(
     const list = await db.delete(List).where(eq(List.id, id)).returning().then(singleOrThrow);
     // List.findByIdAndDelete(id);
 
-    if (!list) {
-      return res.status(404).json({ message: 'List not found' });
-    }
+    if (!list) throw new BackendError('NOT_FOUND', { message: 'List not found.' })
+
     res.status(200).json({ message: 'List deleted successfully' });
   }
 );

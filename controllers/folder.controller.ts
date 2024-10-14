@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { singleOrThrow } from '@/db/utils';
 import { defineAbilitiesFor } from '@/access-control/user.access';
 import { subject } from '@casl/ability';
+import { BackendError } from '@/utils/errors';
 
 const db = getDBClient();
 
@@ -57,11 +58,8 @@ export const updateFolder = createProtectedHandler(
     const { id } = req.params;
     const folder = await db.update(Folder).set(req.body).where(eq(Folder.id, id)).returning().then(singleOrThrow);
 
-    if (!folder) {
-      return res.status(404).json({ message: 'Folder not found' });
-    }
+    if (!folder) throw new BackendError('NOT_FOUND', {message: 'Folder not found.'})
 
-    // const updatedFolder = await Folder.findById(id).populate('author').populate('lists');
     res.status(200).json(folder);
   }
 );
@@ -82,9 +80,8 @@ export const deleteFolder = createProtectedHandler(
 
     const folder = await db.delete(Folder).where(eq(Folder.id, id)).returning().then(singleOrThrow);
 
-    if (!folder) {
-      return res.status(404).json({ message: 'Folder not found' });
-    }
+    if (!folder) throw new BackendError('NOT_FOUND', {message: 'Folder not found.'})
+
     res.status(200).json({ message: 'Folder deleted successfully' });
   }
 );

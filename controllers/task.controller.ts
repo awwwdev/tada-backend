@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { singleOrThrow } from '@/db/utils';
 import { subject } from '@casl/ability';
 import { defineAbilitiesFor } from '@/access-control/user.access';
+import { BackendError } from '@/utils/errors';
 
 const db = getDBClient();
 
@@ -71,9 +72,7 @@ export const updateTask = createProtectedHandler(
 
     const task = await db.update(Task).set(req.body).where(eq(Task.id, id)).returning().then(singleOrThrow);
 
-    if (!task) {
-      return res.status(404).json({ message: 'Task not found' });
-    }
+    if (!task) throw new BackendError('NOT_FOUND', {message: 'Task not found.'})
 
     res.status(200).json(task);
   }
@@ -95,7 +94,8 @@ export const deleteTask = createProtectedHandler(
 
     const task = await db.delete(Task).where(eq(Task.id, id)).returning().then(singleOrThrow);
 
-    if (!task) return res.status(404).json({ message: 'Task not found' });
+    if (!task) throw new BackendError('NOT_FOUND', {message: 'Task not found.'})
+
     res.status(200).json({ message: 'Task deleted successfully' });
   }
 );

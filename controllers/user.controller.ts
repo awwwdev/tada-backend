@@ -5,6 +5,7 @@ import getDBClient from '../db/client';
 import { createProtectedHandler } from '@/utils/createHandler';
 import { z } from 'zod';
 import { singleOrThrow } from '@/db/utils';
+import { BackendError } from '@/utils/errors';
 
 const db = getDBClient();
 
@@ -13,8 +14,8 @@ export const getUser = createProtectedHandler(
   (ability, req) => req.user.id === req.params.id,
   async (req, res) => {
     const { id } = req.params;
-    const user = await db.select().from(User).where(eq(User.id, id)).then(singleOrThrow); //TODO single or throw error
-    //  User.findById(id).populate('folders');
+    const user = await db.select().from(User).where(eq(User.id, id)).then(singleOrThrow);
+
     res.status(200).json(user);
   }
 );
@@ -31,9 +32,7 @@ export const updateUser = createProtectedHandler(
     const user = await db.update(User).set(req.body).where(eq(User.id, id)).returning().then(singleOrThrow);
     // .findByIdAndUpdate(id, req.body);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) throw new BackendError('NOT_FOUND', { message: 'User not found.' });
 
     // const updatedUser = await User.findById(id).populate('folders');
     res.status(200).json(user);
@@ -56,9 +55,7 @@ export const updateSettings = createProtectedHandler(
       .returning()
       .then(singleOrThrow);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) throw new BackendError('NOT_FOUND', { message: 'User not found.' });
 
     res.status(200).json(user);
   }
@@ -74,9 +71,8 @@ export const deleteUser = createProtectedHandler(
 
     const user = await db.delete(User).where(eq(User.id, id)).returning().then(singleOrThrow);
 
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
+    if (!user) throw new BackendError('NOT_FOUND', { message: 'User not found.' });
+
     res.status(200).json({ message: 'User deleted successfully' });
   }
 );
