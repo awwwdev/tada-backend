@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
 import { User } from './models/user.model';
 import getDBClient from './db/client';
+import ERRORS from './errors';
 
 type Callback = (error: Error | null, user?: any | null, options?: any) => void;
 
