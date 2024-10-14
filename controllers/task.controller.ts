@@ -1,17 +1,18 @@
 // const Product = require("../models/product.model");
 import { and, asc, eq } from 'drizzle-orm';
-import { Task } from '../models/task.model';
-import type { Request, Response } from 'express';
+import { Task, taskCreateSchema, taskUpdateSchema } from '../models/task.model';
 import getDBClient from '../db/client';
-import { assertIsLoggedIn } from '../auth/ensureLoggedIn';
-import { UserSelect } from '../models/user.model';
+
 import { createProtectedHandler } from '@/utils/createHandler';
+import { z } from 'zod';
 
 
 const db = getDBClient();
 
 
-export const getTasks = createProtectedHandler(async (req, res) => {
+export const getTasks = createProtectedHandler(
+  z.object({}),
+  async (req, res) => {
   try {
     const userId = req?.user?.id ?? "";
     const listId = req.query.listId as string;
@@ -28,7 +29,7 @@ export const getTasks = createProtectedHandler(async (req, res) => {
   }
 });
 
-export const getTask = createProtectedHandler(async (req, res) => {
+export const getTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) } ) , async (req, res) => {
   try {
     const { id } = req.params;
     const [task] = await db.select().from(Task).where(eq(Task.id, id));
@@ -39,7 +40,7 @@ export const getTask = createProtectedHandler(async (req, res) => {
   }
 });
 
-export const createTask = createProtectedHandler(async (req, res) => {
+export const createTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) , body: taskCreateSchema } ) ,async (req, res) => {
   try {
     const [task] = await db.insert(Task).values(req.body).returning();
     //  Task.create(req.body);
@@ -49,7 +50,7 @@ export const createTask = createProtectedHandler(async (req, res) => {
   }
 });
 
-export const updateTask = createProtectedHandler(async (req, res) => {
+export const updateTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) , body: taskUpdateSchema } ) ,async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -67,7 +68,7 @@ export const updateTask = createProtectedHandler(async (req, res) => {
   }
 });
 
-export const deleteTask = createProtectedHandler(async (req, res) => {
+export const deleteTask = createProtectedHandler(z.object({ params: z.object({ id: z.string() }) } ) , async (req, res) => {
   try {
     const { id } = req.params;
 

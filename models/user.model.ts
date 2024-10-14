@@ -1,6 +1,7 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 
 import { pgTable, text, uuid, customType, timestamp, json } from 'drizzle-orm/pg-core';
+import { z } from 'zod';
 // import * as x from 'drizzle-orm/
 
 const bytea = customType<{ data: Buffer; notNull: false; default: false }>({
@@ -31,13 +32,30 @@ export const User = pgTable('user', {
 export type UserInsert = typeof User.$inferInsert;
 export type UserSelect = typeof User.$inferSelect;
 
+const settingsSchema = z.object({
+  theme: z.enum(['light', 'dark', 'system']).default('system').optional(),
+  showCompletedTasks: z.boolean().default(true).optional(),
+  startOfWeek: z
+    .enum(['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'])
+    .default('sunday')
+    .optional(),
+});
 
 export const userCreateSchema = createInsertSchema(User, {
-  email: (schema) => schema.email.email('Please provide a valid email.'),
-  username: (schema) =>
-    schema.username
-      .min(3, 'Username must be at least 3 characters long.')
-      .max(25, 'Username must be at most 25 characters long.'),
-}).omit({ id: true, createdAt: true, updatedAt: true }).strict();
+  email: z.string().email('Please provide a valid email.'),
+  username: z
+    .string()
+    .min(3, 'Username must be at least 3 characters long.')
+    .max(25, 'Username must be at most 25 characters long.'),
+  settings: settingsSchema,
+})
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    salt: true,
+    passwordHash: true,
+  })
+  .strict();
 
 export const userUpdateSchema = userCreateSchema.partial();

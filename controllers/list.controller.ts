@@ -10,7 +10,9 @@ import { z } from 'zod';
 
 const db = getDBClient();
 
-export const getLists = createProtectedHandler(async (req, res) => {
+export const getLists = createProtectedHandler(
+  z.object({}),
+  async (req, res) => {
   try {
     // @ts-ignore
     const lists = await db.select().from(List)
