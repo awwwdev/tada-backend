@@ -1,12 +1,12 @@
-import { defineAbilitiesFor } from '@/access-control/user.access';
-import { UserSelect } from '@/models/user.model';
+import { defineAbilitiesFor } from '../access-control/user.access';
+import { User } from '../schema/user.model';
 import { AbilityTuple, MongoAbility, MongoQuery } from '@casl/ability';
 import { type NextFunction, type Request, RequestHandler, type Response } from 'express';
 import type { z } from 'zod';
 import { BackendError } from './errors';
 
 export type ProtectedHandler = (
-  req: Omit<Request, 'user'> & { user: UserSelect },
+  req: Omit<Request, 'user'> & { user: User },
   res: Response,
   next?: NextFunction
 ) => ReturnType<RequestHandler>;
@@ -18,7 +18,7 @@ type ValidatedHandler<T extends z.ZodType> = (
 ) => ReturnType<RequestHandler>;
 
 type ValidatedProtectedHandler<T extends z.ZodType> = (
-  req: Omit<Request, keyof z.output<T> | 'user'> & z.output<T> & { user: UserSelect },
+  req: Omit<Request, keyof z.output<T> | 'user'> & z.output<T> & { user: User },
   res: Response,
   next?: NextFunction
 ) => ReturnType<RequestHandler>;
@@ -35,7 +35,7 @@ export function createHandler<T extends z.ZodType>(schema: T, handler: Validated
 }
 
 
-type Req<T extends z.ZodType> = Omit<Request, keyof z.output<T> | 'user'> & z.output<T> & { user: UserSelect };
+type Req<T extends z.ZodType> = Omit<Request, keyof z.output<T> | 'user'> & z.output<T> & { user: User };
 
 export function createProtectedHandler<T extends z.ZodType>(
   schema: T,

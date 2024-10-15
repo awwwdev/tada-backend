@@ -1,9 +1,9 @@
-import listRouter from '../routes/list.route';
-import taskRouter from '../routes/task.route';
-import folderRouter from '../routes/folder.route';
-import authRouter from '../routes/auth.route';
+import listRouter from './list.route';
+import taskRouter from './task.route';
+import folderRouter from './folder.route';
+import authRouter from './auth.route';
 import settingsRouter from './settingsRouter';
-import { createRouter } from '@/utils/createRouter';
+import { createRouter } from '../utils/createRouter';
 
 
 export default createRouter((router) => {

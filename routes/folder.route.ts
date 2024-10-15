@@ -1,5 +1,5 @@
 import { getFolders, getFolder, createFolder, updateFolder, deleteFolder } from '../controllers/folder.controller';
-import { createRouter } from '@/utils/createRouter';
+import { createRouter } from '../utils/createRouter';
 
 export default createRouter((router, protectedRouter) => {
   protectedRouter.get('/', getFolders);

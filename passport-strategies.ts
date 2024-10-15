@@ -1,7 +1,7 @@
 import { Strategy } from 'passport-local';
 import crypto from 'crypto';
 import { eq } from 'drizzle-orm';
-import { User } from './models/user.model';
+import { USER } from './schema/user.model';
 import getDBClient from './db/client';
 import ERRORS from './errors';
 
@@ -16,7 +16,7 @@ export const localStrategy = new Strategy(options, async function verify(
   done: Callback
 ) {
   try {
-    const [user] = await db.select().from(User).where(eq(User.email, email))
+    const [user] = await db.select().from(USER).where(eq(USER.email, email))
     //  .findOne({ email }).select('+passwordHash').select('+salt');
     if (!user) {
       return done(null, false, ERRORS.INVALID_CREDENTIALS);

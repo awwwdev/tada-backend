@@ -1,11 +1,11 @@
-// const Product = require("../models/product.model");
+// const Product = require("../schema/product.model");
 import { eq } from 'drizzle-orm';
-import { User, userUpdateSchema } from '../models/user.model';
+import { USER, userUpdateSchema } from '../schema/user.model';
 import getDBClient from '../db/client';
-import { createProtectedHandler } from '@/utils/createHandler';
+import { createProtectedHandler } from '../utils/createHandler';
 import { z } from 'zod';
-import { singleOrThrow } from '@/db/utils';
-import { BackendError } from '@/utils/errors';
+import { singleOrThrow } from '../db/utils';
+import { BackendError } from '../utils/errors';
 
 const db = getDBClient();
 
@@ -14,7 +14,7 @@ export const getUser = createProtectedHandler(
   (ability, req) => req.user.id === req.params.id,
   async (req, res) => {
     const { id } = req.params;
-    const user = await db.select().from(User).where(eq(User.id, id)).then(singleOrThrow);
+    const user = await db.select().from(USER).where(eq(USER.id, id)).then(singleOrThrow);
 
     res.status(200).json(user);
   }
@@ -29,12 +29,12 @@ export const updateUser = createProtectedHandler(
   async (req, res) => {
     const { id } = req.params;
 
-    const user = await db.update(User).set(req.body).where(eq(User.id, id)).returning().then(singleOrThrow);
+    const user = await db.update(USER).set(req.body).where(eq(USER.id, id)).returning().then(singleOrThrow);
     // .findByIdAndUpdate(id, req.body);
 
-    if (!user) throw new BackendError('NOT_FOUND', { message: 'User not found.' });
+    if (!user) throw new BackendError('NOT_FOUND', { message: 'USER not found.' });
 
-    // const updatedUser = await User.findById(id).populate('folders');
+    // const updatedUser = await USER.findById(id).populate('folders');
     res.status(200).json(user);
   }
 );
@@ -49,13 +49,13 @@ export const updateSettings = createProtectedHandler(
     const { id } = req.params;
 
     const user = await db
-      .update(User)
+      .update(USER)
       .set({ settings: req.body })
-      .where(eq(User.id, id))
+      .where(eq(USER.id, id))
       .returning()
       .then(singleOrThrow);
 
-    if (!user) throw new BackendError('NOT_FOUND', { message: 'User not found.' });
+    if (!user) throw new BackendError('NOT_FOUND', { message: 'USER not found.' });
 
     res.status(200).json(user);
   }
@@ -69,10 +69,10 @@ export const deleteUser = createProtectedHandler(
   async (req, res) => {
     const { id } = req.params;
 
-    const user = await db.delete(User).where(eq(User.id, id)).returning().then(singleOrThrow);
+    const user = await db.delete(USER).where(eq(USER.id, id)).returning().then(singleOrThrow);
 
-    if (!user) throw new BackendError('NOT_FOUND', { message: 'User not found.' });
+    if (!user) throw new BackendError('NOT_FOUND', { message: 'USER not found.' });
 
-    res.status(200).json({ message: 'User deleted successfully' });
+    res.status(200).json({ message: 'USER deleted successfully' });
   }
 );

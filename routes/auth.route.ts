@@ -1,9 +1,10 @@
 import passport from 'passport';
 import crypto from 'crypto';
-import { User } from '../models/user.model';
 import getDBClient from '../db/client';
-import { createRouter } from '@/utils/createRouter';
-import { BackendError } from '@/utils/errors';
+import { createRouter } from '../utils/createRouter';
+import { BackendError } from '../utils/errors';
+import { USER } from '../schema/user.model';
+import { singleOrThrow } from '../db/utils';
 
 const db = getDBClient();
 
@@ -52,15 +53,15 @@ export default createRouter((router) => {
       if (err) return next(err);
 
       try {
-        const [user] = await db
-          .insert(User)
+        const user = await db
+          .insert(USER)
           .values({
             username: req.body.username,
             email: req.body.email,
             passwordHash: hashedPassword,
             salt,
           })
-          .returning();
+          .returning().then(singleOrThrow);
         // User.create({
         //   // username: req.body.username,
         //   email: req.body.email,

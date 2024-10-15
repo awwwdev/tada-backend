@@ -1,11 +1,11 @@
 import { AbilityBuilder, createMongoAbility } from '@casl/ability'
-// import { User } from '../models'; // application specific interfaces
-import { UserSelect } from '@/models/user.model';
+// import { User } from '../schema'; // application specific interfaces
+import type { User } from '../schema/user.model';
 
 /**
  * @param user contains details about logged in user: its id, name, email, etc
  */
-export function defineAbilitiesFor(user: UserSelect) {
+export function defineAbilitiesFor(user: User) {
   const { can, build } = new AbilityBuilder(createMongoAbility);
 
   can('read', 'Folder', { authorId: user.id });

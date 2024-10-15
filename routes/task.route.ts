@@ -1,5 +1,5 @@
 import { getTasks, getTask, createTask, updateTask, deleteTask } from '../controllers/task.controller';
-import { createRouter } from '@/utils/createRouter';
+import { createRouter } from '../utils/createRouter';
 
 export default createRouter((router, protectedRouter) => {
 

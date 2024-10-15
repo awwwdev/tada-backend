@@ -16,7 +16,7 @@ type Settings = {
   startOfWeek?: 'sunday' | 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday';
 };
 
-export const User = pgTable('user', {
+export const USER = pgTable('user', {
   id: uuid('id').primaryKey().defaultRandom(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').$onUpdate(() => new Date()),
@@ -29,8 +29,7 @@ export const User = pgTable('user', {
     .default({ theme: 'system', showCompletedTasks: true, startOfWeek: 'sunday' }),
 });
 
-export type UserInsert = typeof User.$inferInsert;
-export type UserSelect = typeof User.$inferSelect;
+// export type UserInsert = typeof USER.$inferInsert;
 
 const settingsSchema = z.object({
   theme: z.enum(['light', 'dark', 'system']).default('system').optional(),
@@ -41,13 +40,13 @@ const settingsSchema = z.object({
     .optional(),
 });
 
-export const userCreateSchema = createInsertSchema(User, {
+export const userCreateSchema = createInsertSchema(USER, {
   email: z.string().email('Please provide a valid email.'),
   username: z
     .string()
     .min(3, 'Username must be at least 3 characters long.')
     .max(25, 'Username must be at most 25 characters long.'),
-  settings: settingsSchema,
+  settings: settingsSchema
 })
   .omit({
     id: true,
@@ -59,3 +58,7 @@ export const userCreateSchema = createInsertSchema(User, {
   .strict();
 
 export const userUpdateSchema = userCreateSchema.partial();
+
+export type User = typeof USER.$inferSelect;
+export type NewUser = z.infer<typeof userCreateSchema>;
+export type UpdateUser = z.infer<typeof userUpdateSchema>;

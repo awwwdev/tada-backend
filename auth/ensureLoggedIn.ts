@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { BackendError } from '@/utils/errors';
+import { BackendError } from '../utils/errors';
 
 const ensureLoggedIn: RequestHandler = (req, res, next) => {
   if (req.isAuthenticated()) return next();

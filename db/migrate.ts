@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 import config from '../config';
-import getDBClient from '../db/client';
+import getDBClient from './client';
 
 export const migrationConnection = postgres(config().POSTGRESQL_CONNECTION_STRING, { max: 1 });
 

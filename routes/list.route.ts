@@ -1,6 +1,6 @@
 
 import { getLists, getList, createList, updateList, deleteList } from '../controllers/list.controller';
-import { createRouter } from '@/utils/createRouter';
+import { createRouter } from '../utils/createRouter';
 
 export default createRouter((router, protectedRouter) => {
 
